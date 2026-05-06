@@ -1,0 +1,24 @@
+# PostgreSQL for the Hospital API (local development).
+# Run from repo root:  docker compose up -d
+# Connection matches .env.example / default .env (host localhost, port 5432, DB hospital).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hospital
+    ports:
+      - '5432:5432'
+    volumes:
+      - hospital_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d hospital']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  hospital_pg:

@@ -1,0 +1,95 @@
+<p-toast />
+<p-card header="Fee catalog (admin)">
+  <p class="hint">
+    Add or edit services (X-ray, lab, radiology, etc.). Reception uses this list
+    when posting charges to a patient.
+  </p>
+  <div class="toolbar">
+    <p-button
+      label="Back"
+      icon="pi pi-arrow-left"
+      [text]="true"
+      routerLink="/admin/dashboard"
+    />
+    <p-button label="Add service" icon="pi pi-plus" (onClick)="openCreate()" />
+  </div>
+  <p-table [value]="rows()" [loading]="loading()" [tableStyle]="{ 'min-width': '44rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Default price</th>
+        <th>Sort</th>
+        <th>Active</th>
+        <th style="width: 10rem">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-r>
+      <tr>
+        <td>{{ r.name }}</td>
+        <td>{{ r.defaultPrice }}</td>
+        <td>{{ r.sortOrder }}</td>
+        <td>
+          <p-tag [value]="r.isActive ? 'Yes' : 'No'" [severity]="r.isActive ? 'success' : 'secondary'" />
+        </td>
+        <td>
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="openEdit(r)"
+            ariaLabel="Edit"
+          />
+          @if (r.isActive) {
+            <p-button
+              icon="pi pi-ban"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              (onClick)="deactivate(r)"
+              ariaLabel="Deactivate"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog
+  [(visible)]="dialogVisible"
+  [header]="editingId ? 'Edit service' : 'New service'"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+>
+  <div class="dlg-grid">
+    <label for="fn">Name</label>
+    <input pInputText id="fn" [(ngModel)]="formName" class="w-full" />
+    <label for="fp">Default price</label>
+    <p-inputNumber
+      id="fp"
+      [(ngModel)]="formPrice"
+      mode="decimal"
+      [minFractionDigits]="2"
+      [maxFractionDigits]="2"
+      [min]="0"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+    />
+    <label for="fs">Sort order</label>
+    <p-inputNumber
+      id="fs"
+      [(ngModel)]="formSort"
+      [useGrouping]="false"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+    />
+    @if (editingId) {
+      <label for="fa">Active</label>
+      <p-toggleSwitch [(ngModel)]="formActive" inputId="fa" />
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" (onClick)="dialogVisible = false" />
+    <p-button label="Save" icon="pi pi-check" (onClick)="save()" />
+  </ng-template>
+</p-dialog>

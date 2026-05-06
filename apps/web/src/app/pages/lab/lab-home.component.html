@@ -1,0 +1,22 @@
+@if (loading()) {
+  <div class="lab-loading">
+    <p-progressSpinner strokeWidth="4" />
+    <span>Loading lab workspace…</span>
+  </div>
+} @else if (error(); as err) {
+  <p-card header="Laboratory">
+    <p class="err">{{ err }}</p>
+    <p-button label="Retry" icon="pi pi-refresh" (onClick)="retry()" />
+  </p-card>
+} @else if (bench(); as b) {
+  <div class="lab-head">
+    <div>
+      <h1 class="lab-title">{{ b.title }}</h1>
+      <p class="lab-sub">Updated {{ b.generatedAt | date: 'medium' }}</p>
+    </div>
+    <p-button label="Patient lookup" icon="pi pi-users" routerLink="/patients" />
+  </div>
+  <p-card [header]="'Coming next'">
+    <p class="lab-summary">{{ b.summary }}</p>
+  </p-card>
+}

@@ -1,0 +1,84 @@
+<p-toast />
+<p-card header="Register patient">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="grid">
+    <div class="col">
+      <label for="fn">First name *</label>
+      <input pInputText id="fn" formControlName="firstName" class="w-full" />
+    </div>
+    <div class="col">
+      <label for="ln">Last name *</label>
+      <input pInputText id="ln" formControlName="lastName" class="w-full" />
+    </div>
+    <div class="col">
+      <label for="gender">Gender *</label>
+      <select id="gender" formControlName="gender" class="w-full native">
+        @for (g of genders; track g) {
+          <option [value]="g">{{ g }}</option>
+        }
+      </select>
+    </div>
+    <div class="col">
+      <label for="dob">Date of birth *</label>
+      <input pInputText id="dob" type="date" formControlName="dob" class="w-full" />
+    </div>
+    <div class="col">
+      <label for="phone">Phone</label>
+      <input pInputText id="phone" formControlName="phone" class="w-full" />
+    </div>
+    <div class="col">
+      <label for="blood">Blood group</label>
+      <select id="blood" formControlName="bloodGroup" class="w-full native">
+        <option value="">(not specified)</option>
+        @for (b of bloodGroups; track b) {
+          <option [value]="b">{{ b }}</option>
+        }
+      </select>
+    </div>
+    <div class="col full">
+      <label for="addr">Address</label>
+      <input pInputText id="addr" formControlName="address" class="w-full" />
+    </div>
+    <div class="col">
+      <label for="ecn">Emergency contact name</label>
+      <input
+        pInputText
+        id="ecn"
+        formControlName="emergencyContactName"
+        class="w-full"
+      />
+    </div>
+    <div class="col">
+      <label for="ecp">Emergency contact phone</label>
+      <input
+        pInputText
+        id="ecp"
+        formControlName="emergencyContactPhone"
+        class="w-full"
+      />
+    </div>
+    <div class="col full">
+      <label for="notes">Notes</label>
+      <textarea
+        pTextarea
+        id="notes"
+        formControlName="notes"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </div>
+    <div class="col full actions">
+      <p-button
+        type="submit"
+        label="Save patient"
+        icon="pi pi-check"
+        [loading]="saving"
+      />
+      <p-button
+        type="button"
+        label="Cancel"
+        severity="secondary"
+        (onClick)="cancel()"
+      />
+    </div>
+  </form>
+</p-card>

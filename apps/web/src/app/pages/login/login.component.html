@@ -1,0 +1,49 @@
+<div class="login-wrap">
+  <p-toast />
+  <header class="login-brand">
+    <h1 class="login-product">{{ branding.productName }}</h1>
+    <p class="login-vendor">
+      {{ branding.designedByLine }} —
+      <a [href]="branding.companyWebsite" target="_blank" rel="noopener noreferrer">{{
+        branding.companyWebsiteDisplay
+      }}</a>
+      <span class="login-vendor-sep" aria-hidden="true">·</span>
+      <a [href]="'tel:' + branding.supportPhoneTel">{{ branding.supportPhoneDisplay }}</a>
+    </p>
+  </header>
+  <p-card header="Sign in" subheader="Admin or receptionist">
+    <form (ngSubmit)="submit()" [formGroup]="form" class="login-form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full"
+          autocomplete="username"
+        />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <p-password
+          formControlName="password"
+          inputId="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          autocomplete="current-password"
+        />
+      </div>
+      <p-button
+        type="submit"
+        label="Sign in"
+        icon="pi pi-sign-in"
+        [loading]="loading"
+        [disabled]="form.invalid"
+        styleClass="w-full"
+      />
+    </form>
+  </p-card>
+</div>

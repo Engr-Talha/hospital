@@ -1,0 +1,22 @@
+.hint {
+  color: var(--p-text-muted-color, #6c757d);
+  margin-top: 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.dlg-grid {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.65rem 0.75rem;
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}

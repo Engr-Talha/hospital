@@ -1,0 +1,147 @@
+@use './life-care-slip-shared' as *;
+
+.lc-fee-slip-title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 4px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lc-fee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 14px;
+  font-size: 10px;
+}
+
+.lc-fee-table th,
+.lc-fee-table td {
+  border: 1px solid #000;
+  padding: 5px 6px;
+  vertical-align: top;
+}
+
+.lc-fee-table th {
+  background: #f0f0f0;
+  font-weight: 800;
+  text-align: left;
+}
+
+.lc-col-desc {
+  width: 58%;
+}
+
+.lc-col-num {
+  width: 14%;
+}
+
+.lc-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-fee-total td {
+  font-weight: 800;
+  background: #fafafa;
+}
+
+.lc-fee-disclaimer {
+  text-align: right;
+  font-size: 9px;
+  font-style: italic;
+  color: #444;
+  margin: 0 0 8px;
+}
+
+.lc-fee-footer-ur {
+  font-size: 10px;
+  text-align: right;
+  margin: 0;
+}
+
+/* ----- POS / thermal preview (screen) ----- */
+.print-area.fee-slip--pos {
+  width: 80mm;
+  max-width: 100%;
+  min-height: auto;
+  padding: 3mm 4mm 4mm;
+  margin: 0 auto;
+  font-size: 9px;
+  box-shadow: 0 0 0 1px #ccc;
+}
+
+.fee-pos-head {
+  text-align: center;
+  margin-bottom: 4px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 4px;
+}
+
+.fee-pos-clinic {
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.fee-pos-tag {
+  font-size: 8px;
+  font-weight: 700;
+  margin-top: 2px;
+  letter-spacing: 0.12em;
+}
+
+.fee-pos-addr {
+  font-size: 7.5px;
+  color: #333;
+  margin-top: 2px;
+}
+
+.fee-pos-patient .lc-ref-date {
+  margin-bottom: 2px;
+}
+
+.fee-pos-row {
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+
+.fee-pos-meta {
+  font-size: 8px;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.fee-pos-rule {
+  margin: 4px 0 6px;
+}
+
+.lc-fee-table--pos {
+  font-size: 7.5px;
+  margin: 4px 0 6px;
+}
+
+.lc-fee-table--pos th,
+.lc-fee-table--pos td {
+  padding: 2px 3px;
+}
+
+.lc-fee-table--pos .lc-col-desc {
+  width: 46%;
+}
+
+.fee-pos-disclaimer {
+  font-size: 7px;
+  font-style: italic;
+  text-align: center;
+  margin: 0 0 4px;
+  color: #444;
+}
+
+.fee-pos-vendor {
+  font-size: 6.5pt !important;
+  margin-top: 4px !important;
+  padding-top: 3px !important;
+}

@@ -1,0 +1,201 @@
+@if (loading()) {
+  <div class="dash-loading">
+    <p-progressSpinner strokeWidth="4" />
+    <span>Loading overview…</span>
+  </div>
+} @else if (error(); as err) {
+  <p-card header="Dashboard">
+    <p class="err">{{ err }}</p>
+    <p-button label="Retry" icon="pi pi-refresh" (onClick)="retry()" />
+  </p-card>
+} @else if (overview(); as o) {
+  <div class="dash-head">
+    <div>
+      <h1 class="dash-title">Operations overview</h1>
+      <p class="dash-sub">
+        Snapshot as of {{ o.generatedAt | date: 'medium' }}
+      </p>
+    </div>
+    <div class="dash-actions">
+      <p-button label="Patients" icon="pi pi-users" routerLink="/patients" />
+      <p-button
+        label="Register"
+        icon="pi pi-user-plus"
+        routerLink="/patients/new"
+      />
+      @if (auth.user()?.role === adminRole) {
+        <p-button
+          label="Fee catalog"
+          icon="pi pi-list"
+          routerLink="/admin/fee-catalog"
+          severity="secondary"
+        />
+        <p-button
+          label="Users"
+          icon="pi pi-shield"
+          routerLink="/admin/users"
+          severity="secondary"
+        />
+      }
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Total patients</span>
+        <span class="stat-value">{{ o.patients.total }}</span>
+        <span class="stat-hint">All time</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card stat-accent-blue">
+      <div class="stat-inner">
+        <span class="stat-label">Registered today</span>
+        <span class="stat-value">{{ o.patients.today }}</span>
+        <span class="stat-hint">New today</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Last 7 days</span>
+        <span class="stat-value">{{ o.patients.last7Days }}</span>
+        <span class="stat-hint">New patients</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">This month</span>
+        <span class="stat-value">{{ o.patients.thisMonth }}</span>
+        <span class="stat-hint">New patients</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card stat-accent-green">
+      <div class="stat-inner">
+        <span class="stat-label">Total revenue</span>
+        <span class="stat-value">{{ o.fees.totalRevenue | number: '1.2-2' }}</span>
+        <span class="stat-hint">All charge lines</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Revenue today</span>
+        <span class="stat-value">{{ o.fees.today | number: '1.2-2' }}</span>
+        <span class="stat-hint">Posted today</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Revenue (7d)</span>
+        <span class="stat-value">{{ o.fees.last7Days | number: '1.2-2' }}</span>
+        <span class="stat-hint">Rolling week</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Revenue (month)</span>
+        <span class="stat-value">{{ o.fees.thisMonth | number: '1.2-2' }}</span>
+        <span class="stat-hint">Calendar month</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Charge lines</span>
+        <span class="stat-value">{{ o.fees.totalChargeLines }}</span>
+        <span class="stat-hint">Line items total</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Patients with charges</span>
+        <span class="stat-value">{{ o.fees.patientsWithCharges }}</span>
+        <span class="stat-hint">Billed at least once</span>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card">
+      <div class="stat-inner">
+        <span class="stat-label">Avg / billed patient</span>
+        <span class="stat-value">{{
+          o.fees.avgRevenuePerChargedPatient | number: '1.2-2'
+        }}</span>
+        <span class="stat-hint">Mean revenue</span>
+      </div>
+    </p-card>
+  </div>
+
+  <div class="chart-row">
+    <p-card header="Daily registrations (30 days)">
+      <div class="chart-wrap">
+        <p-chart type="line" [data]="regChartData" [options]="regChartOptions" />
+      </div>
+    </p-card>
+    <p-card header="Daily revenue (30 days)">
+      <div class="chart-wrap">
+        <p-chart type="line" [data]="revChartData" [options]="revChartOptions" />
+      </div>
+    </p-card>
+  </div>
+
+  <div class="chart-row trio">
+    <p-card header="Patients by gender">
+      <div class="chart-wrap chart-doughnut">
+        <p-chart
+          type="doughnut"
+          [data]="genderChartData"
+          [options]="genderChartOptions"
+        />
+      </div>
+    </p-card>
+    <p-card header="Revenue by category">
+      <div class="chart-wrap chart-tall">
+        <p-chart
+          type="bar"
+          [data]="categoryChartData"
+          [options]="categoryChartOptions"
+        />
+      </div>
+    </p-card>
+    <p-card header="Top services (revenue)">
+      <div class="chart-wrap chart-tall">
+        <p-chart
+          type="bar"
+          [data]="topServicesChartData"
+          [options]="topServicesChartOptions"
+        />
+      </div>
+    </p-card>
+  </div>
+
+  <p-card header="Recent patients">
+    <p-table [value]="o.recentPatients" [tableStyle]="{ 'min-width': '100%' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>MRN</th>
+          <th>Name</th>
+          <th>Registered</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.mrn }}</td>
+          <td>{{ row.firstName }} {{ row.lastName }}</td>
+          <td>{{ row.createdAt | date: 'short' }}</td>
+          <td>
+            <p-button
+              icon="pi pi-eye"
+              [rounded]="true"
+              [text]="true"
+              [routerLink]="['/patients', row.id]"
+              ariaLabel="Open"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">No patients yet.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+}

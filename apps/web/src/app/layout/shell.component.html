@@ -1,0 +1,25 @@
+<div class="shell">
+  <header class="shell-header">
+    <p-menubar [model]="menuModel()" styleClass="border-noround shell-menubar">
+      <ng-template pTemplate="start">
+        <a [routerLink]="auth.homePath()" class="shell-brand" [attr.title]="branding.productName">
+          <span class="shell-brand-short">{{ branding.productShortName }}</span>
+          <span class="shell-brand-full">{{ branding.productName }}</span>
+        </a>
+      </ng-template>
+    </p-menubar>
+  </header>
+  <p-toast />
+  <main class="shell-main">
+    <router-outlet />
+  </main>
+  <footer class="shell-footer">
+    <span>{{ branding.designedByLine }}</span>
+    <span class="shell-footer-sep" aria-hidden="true">·</span>
+    <a [href]="branding.companyWebsite" target="_blank" rel="noopener noreferrer">{{
+      branding.companyWebsiteDisplay
+    }}</a>
+    <span class="shell-footer-sep" aria-hidden="true">·</span>
+    <a [href]="'tel:' + branding.supportPhoneTel">{{ branding.supportPhoneDisplay }}</a>
+  </footer>
+</div>

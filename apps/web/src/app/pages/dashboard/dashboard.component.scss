@@ -1,0 +1,114 @@
+.dash-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: var(--p-text-muted-color, #64748b);
+}
+
+.dash-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.dash-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.dash-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color, #64748b);
+}
+
+.dash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+::ng-deep .stat-card .p-card-body {
+  padding: 0.85rem 1rem;
+}
+
+.stat-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-text-muted-color, #64748b);
+}
+
+.stat-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-hint {
+  font-size: 0.7rem;
+  color: var(--p-text-muted-color, #94a3b8);
+}
+
+.stat-accent-blue .stat-value {
+  color: #2563eb;
+}
+
+.stat-accent-green .stat-value {
+  color: #059669;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.chart-row.trio {
+  grid-template-columns: minmax(14rem, 1fr) 1.4fr 1.4fr;
+}
+
+@media (max-width: 1100px) {
+  .chart-row,
+  .chart-row.trio {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-wrap {
+  height: 260px;
+  position: relative;
+}
+
+.chart-wrap.chart-doughnut {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.chart-wrap.chart-tall {
+  height: 300px;
+}
+
+.err {
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,255 @@
+<p-toast />
+@if (patient(); as p) {
+  <p-card [header]="p.firstName + ' ' + p.lastName" [subheader]="p.mrn">
+    <div class="toolbar">
+      @if (auth.hasPermission(Permission.PATIENT_REGISTRATION_PRINT)) {
+        <p-button
+          label="Registration slip"
+          icon="pi pi-print"
+          (onClick)="print()"
+        />
+      }
+      @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+        <p-button
+          label="Fee slip (A4)"
+          icon="pi pi-money-bill"
+          severity="help"
+          (onClick)="printFees()"
+        />
+        <p-button
+          label="Charges POS receipt"
+          icon="pi pi-print"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="printFeesPos()"
+        />
+      }
+      <p-button
+        label="Back to list"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        routerLink="/patients"
+      />
+      @if (auth.hasPermission(Permission.PATIENT_DELETE)) {
+        <p-button
+          label="Delete patient"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="remove()"
+        />
+      }
+    </div>
+    <p-divider />
+    <dl class="grid-dl">
+      <dt>Gender</dt>
+      <dd><p-tag [value]="p.gender" /></dd>
+      <dt>Date of birth</dt>
+      <dd>{{ p.dob }}</dd>
+      <dt>Phone</dt>
+      <dd>{{ p.phone || '—' }}</dd>
+      <dt>Blood group</dt>
+      <dd>{{ p.bloodGroup || '—' }}</dd>
+      <dt>Address</dt>
+      <dd>{{ p.address || '—' }}</dd>
+      <dt>Emergency contact</dt>
+      <dd>
+        {{ p.emergencyContactName || '—' }}
+        @if (p.emergencyContactPhone) {
+          <span> · {{ p.emergencyContactPhone }}</span>
+        }
+      </dd>
+      <dt>Notes</dt>
+      <dd>{{ p.notes || '—' }}</dd>
+      <dt>Registered by</dt>
+      <dd>
+        @if (p.registeredBy) {
+          {{ p.registeredBy.name }} ({{ p.registeredBy.email }})
+        } @else {
+          —
+        }
+      </dd>
+      <dt>Created</dt>
+      <dd>{{ p.createdAt | date: 'medium' }}</dd>
+    </dl>
+  </p-card>
+
+  @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+  <p-card header="Charges & fees" class="mt-card">
+    <div class="fee-toolbar">
+      <p-button
+        label="Add charge"
+        icon="pi pi-plus"
+        (onClick)="openAddFee()"
+      />
+      <span class="fee-total">Total: <strong>{{ feeTotal() }}</strong></span>
+    </div>
+    <p-table [value]="feeLines()" [tableStyle]="{ 'min-width': '36rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Unit</th>
+          <th>Line total</th>
+          <th>By</th>
+          <th style="width: 16rem">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.description }}</td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.unitPrice }}</td>
+          <td>{{ row.lineTotal }}</td>
+          <td>{{ row.createdByName || '—' }}</td>
+          <td class="fee-actions">
+            <p-button
+              label="Print"
+              icon="pi pi-print"
+              [text]="true"
+              (onClick)="printFeeLine(row)"
+              ariaLabel="Print charge"
+            />
+            <p-button
+              label="Edit"
+              icon="pi pi-pencil"
+              [text]="true"
+              (onClick)="openEditFee(row)"
+              ariaLabel="Edit"
+            />
+            <p-button
+              label="Delete"
+              icon="pi pi-trash"
+              [text]="true"
+              severity="danger"
+              (onClick)="removeFee(row)"
+              ariaLabel="Remove"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">No charges yet. Use “Add charge”.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+  }
+}
+
+<p-dialog
+  header="Add charge"
+  [(visible)]="addDialog"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  <div class="add-fee">
+    <div class="mode-row">
+      <p-button
+        label="From price list"
+        [outlined]="addMode !== 'catalog'"
+        (onClick)="addMode = 'catalog'; onCatalogChange()"
+      />
+      <p-button
+        label="Custom"
+        [outlined]="addMode !== 'custom'"
+        (onClick)="addMode = 'custom'"
+      />
+    </div>
+    @if (addMode === 'catalog') {
+      <label class="blk">Service</label>
+      <p-select
+        [options]="catalogSelectOptions()"
+        [(ngModel)]="selCatalogId"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select"
+        (onChange)="onCatalogChange()"
+        styleClass="w-full"
+      />
+    } @else {
+      <label class="blk" for="cd">Description</label>
+      <input pInputText id="cd" [(ngModel)]="customDesc" class="w-full" />
+    }
+    <label class="blk" for="q">Quantity</label>
+    <p-inputNumber
+      inputId="q"
+      [(ngModel)]="qty"
+      [min]="0.01"
+      [step]="0.01"
+      mode="decimal"
+      [maxFractionDigits]="2"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+    />
+    <label class="blk" for="u">Unit price</label>
+    <p-inputNumber
+      inputId="u"
+      [(ngModel)]="unitPrice"
+      [min]="0"
+      mode="decimal"
+      [minFractionDigits]="2"
+      [maxFractionDigits]="2"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+    />
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" (onClick)="addDialog = false" />
+    <p-button label="Add" icon="pi pi-check" (onClick)="saveNewFee()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Edit charge"
+  [(visible)]="editDialog"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  (onHide)="editingLine.set(null)"
+>
+  @if (editingLine(); as el) {
+    <div class="add-fee">
+      @if (el.catalogItemId) {
+        <p class="hint">
+          Linked to price list: description is fixed. Change quantity or unit
+          price only.
+        </p>
+      }
+      <label class="blk" for="ed">Description</label>
+      <input
+        pInputText
+        id="ed"
+        [(ngModel)]="editDesc"
+        class="w-full"
+        [disabled]="!!el.catalogItemId"
+      />
+      <label class="blk" for="eq">Quantity</label>
+      <p-inputNumber
+        inputId="eq"
+        [(ngModel)]="editQty"
+        [min]="0.01"
+        [step]="0.01"
+        mode="decimal"
+        [maxFractionDigits]="2"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+      <label class="blk" for="eu">Unit price</label>
+      <p-inputNumber
+        inputId="eu"
+        [(ngModel)]="editUnitPrice"
+        [min]="0"
+        mode="decimal"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="2"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" (onClick)="editDialog = false" />
+    <p-button label="Save" icon="pi pi-check" (onClick)="saveEditFee()" />
+  </ng-template>
+</p-dialog>

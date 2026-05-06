@@ -1,0 +1,90 @@
+@if (loading()) {
+  <div class="desk-loading">
+    <p-progressSpinner strokeWidth="4" />
+    <span>Loading front desk…</span>
+  </div>
+} @else if (error(); as err) {
+  <p-card header="Front desk">
+    <p class="err">{{ err }}</p>
+    <p-button label="Retry" icon="pi pi-refresh" (onClick)="retry()" />
+  </p-card>
+} @else if (desk(); as d) {
+  <div class="desk-head">
+    <div>
+      <h1 class="desk-title">Front desk</h1>
+      <p class="desk-sub">Snapshot as of {{ d.generatedAt | date: 'medium' }}</p>
+    </div>
+    <div class="desk-actions">
+      <p-button label="Patients" icon="pi pi-users" routerLink="/patients" />
+      <p-button
+        label="Register patient"
+        icon="pi pi-user-plus"
+        routerLink="/patients/new"
+      />
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <p-card header="Patients (total)">
+      <p class="stat-val">{{ d.patients.total }}</p>
+    </p-card>
+    <p-card header="New today">
+      <p class="stat-val">{{ d.patients.today }}</p>
+    </p-card>
+    <p-card header="New (7 days)">
+      <p class="stat-val">{{ d.patients.last7Days }}</p>
+    </p-card>
+    <p-card header="New (this month)">
+      <p class="stat-val">{{ d.patients.thisMonth }}</p>
+    </p-card>
+  </div>
+
+  <div class="stat-grid mt-card">
+    <p-card header="Charges today">
+      <p class="stat-val">{{ d.fees.today }}</p>
+    </p-card>
+    <p-card header="Charges (7 days)">
+      <p class="stat-val">{{ d.fees.last7Days }}</p>
+    </p-card>
+    <p-card header="Charges (this month)">
+      <p class="stat-val">{{ d.fees.thisMonth }}</p>
+    </p-card>
+    <p-card header="Charge lines (all time)">
+      <p class="stat-val">{{ d.fees.totalChargeLines }}</p>
+    </p-card>
+  </div>
+
+  <p-card header="Recent registrations" class="mt-card">
+    <p-table [value]="d.recentPatients" [tableStyle]="{ 'min-width': '40rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>MRN</th>
+          <th>Name</th>
+          <th>Registered</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          <td>{{ r.mrn }}</td>
+          <td>{{ r.firstName }} {{ r.lastName }}</td>
+          <td>{{ r.createdAt | date: 'short' }}</td>
+          <td>
+            <p-button
+              icon="pi pi-eye"
+              [rounded]="true"
+              [text]="true"
+              [routerLink]="['/patients', r.id]"
+              ariaLabel="Open"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">No patients yet.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+}

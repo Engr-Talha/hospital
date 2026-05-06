@@ -1,0 +1,40 @@
+.lab-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary);
+}
+
+.lab-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.lab-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.lab-sub {
+  margin: 0.25rem 0 0;
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+}
+
+.lab-summary {
+  margin: 0;
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.err {
+  color: var(--red-500);
+  margin: 0 0 1rem;
+}

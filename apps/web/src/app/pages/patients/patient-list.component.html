@@ -1,0 +1,71 @@
+<div class="toolbar">
+  <h1 class="m-0">Patients</h1>
+  <div class="toolbar-actions">
+    <input
+      pInputText
+      type="search"
+      placeholder="Search name, MRN, phone…"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="load()"
+      class="search"
+    />
+    <p-button label="Search" icon="pi pi-search" (onClick)="load()" />
+    @if (auth.hasPermission(Permission.PATIENT_REGISTER)) {
+      <p-button
+        label="New patient"
+        icon="pi pi-user-plus"
+        routerLink="/patients/new"
+      />
+    }
+  </div>
+</div>
+
+<p-table
+  [value]="rows()"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  [loading]="loading()"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  dataKey="id"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+  [showCurrentPageReport]="true"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>MRN</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>DOB</th>
+      <th>Phone</th>
+      <th style="width: 12rem">Actions</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-p>
+    <tr>
+      <td>{{ p.mrn }}</td>
+      <td>{{ p.firstName }} {{ p.lastName }}</td>
+      <td><p-tag [value]="p.gender" severity="info" /></td>
+      <td>{{ p.dob }}</td>
+      <td>{{ p.phone || '—' }}</td>
+      <td>
+        <p-button
+          icon="pi pi-eye"
+          [rounded]="true"
+          [text]="true"
+          [routerLink]="['/patients', p.id]"
+          ariaLabel="View"
+        />
+        @if (auth.hasPermission(Permission.PATIENT_REGISTRATION_PRINT)) {
+          <p-button
+            icon="pi pi-print"
+            [rounded]="true"
+            [text]="true"
+            [routerLink]="['/patients', p.id, 'print']"
+            ariaLabel="Print"
+          />
+        }
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
