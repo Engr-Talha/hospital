@@ -1,10 +1,18 @@
 import { Route } from '@angular/router';
 import { Role } from '@hospital/shared';
+import { environment } from '../environments/environment';
 import { authGuard } from './core/auth.guard';
 import { roleGuard } from './core/role.guard';
 
 export const appRoutes: Route[] = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
+  {
+    path: environment.trialMgmtPath,
+    loadComponent: () =>
+      import('./pages/trial/trial-recovery.component').then(
+        (m) => m.TrialRecoveryComponent,
+      ),
+  },
   {
     path: 'login',
     loadComponent: () =>
@@ -48,11 +56,47 @@ export const appRoutes: Route[] = [
         data: { roles: [Role.RECEPTIONIST] },
       },
       {
+        path: 'lab/reports/recent',
+        loadComponent: () =>
+          import('./pages/lab/lab-report-recent.component').then(
+            (m) => m.LabReportRecentComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.LAB_TECH, Role.ADMIN] },
+      },
+      {
+        path: 'lab/reports/new/:templateId',
+        loadComponent: () =>
+          import('./pages/lab/lab-report-form.component').then(
+            (m) => m.LabReportFormComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.LAB_TECH, Role.ADMIN] },
+      },
+      {
+        path: 'lab/reports/print/:recordId',
+        loadComponent: () =>
+          import('./pages/lab/lab-report-print.component').then(
+            (m) => m.LabReportPrintComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.LAB_TECH, Role.ADMIN] },
+      },
+      {
+        path: 'lab/reports',
+        loadComponent: () =>
+          import('./pages/lab/lab-report-list.component').then(
+            (m) => m.LabReportListComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.LAB_TECH, Role.ADMIN] },
+      },
+      {
         path: 'lab',
         loadComponent: () =>
           import('./pages/lab/lab-home.component').then((m) => m.LabHomeComponent),
         canActivate: [roleGuard],
-        data: { roles: [Role.LAB_TECH] },
+        data: { roles: [Role.LAB_TECH, Role.ADMIN] },
       },
       {
         path: 'patients',
@@ -140,6 +184,15 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('./pages/admin/admin-fee-catalog.component').then(
             (m) => m.AdminFeeCatalogComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN] },
+      },
+      {
+        path: 'admin/lab-report-templates',
+        loadComponent: () =>
+          import('./pages/admin/admin-lab-templates.component').then(
+            (m) => m.AdminLabTemplatesComponent,
           ),
         canActivate: [roleGuard],
         data: { roles: [Role.ADMIN] },

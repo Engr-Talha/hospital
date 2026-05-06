@@ -1,0 +1,56 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import {
+  CreateLabReportRecordDto,
+  LabReportRecordDetail,
+  LabReportRecordSummary,
+  LabReportTemplateSummary,
+  UpdateLabReportTemplateDto,
+} from '@hospital/shared';
+import { Observable } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class LabReportsApiService {
+  constructor(private readonly http: HttpClient) {}
+
+  listTemplates(): Observable<LabReportTemplateSummary[]> {
+    return this.http.get<LabReportTemplateSummary[]>('/api/lab/report-templates');
+  }
+
+  getTemplate(id: string): Observable<LabReportTemplateSummary> {
+    return this.http.get<LabReportTemplateSummary>(
+      `/api/lab/report-templates/${id}`,
+    );
+  }
+
+  createRecord(body: CreateLabReportRecordDto): Observable<LabReportRecordDetail> {
+    return this.http.post<LabReportRecordDetail>('/api/lab/report-records', body);
+  }
+
+  listRecords(limit = 50): Observable<LabReportRecordSummary[]> {
+    return this.http.get<LabReportRecordSummary[]>('/api/lab/report-records', {
+      params: { limit: String(limit) },
+    });
+  }
+
+  getRecord(id: string): Observable<LabReportRecordDetail> {
+    return this.http.get<LabReportRecordDetail>(`/api/lab/report-records/${id}`);
+  }
+
+  /** Admin: all templates including inactive. */
+  listTemplatesAdmin(): Observable<LabReportTemplateSummary[]> {
+    return this.http.get<LabReportTemplateSummary[]>(
+      '/api/admin/lab-report-templates',
+    );
+  }
+
+  updateTemplateAdmin(
+    id: string,
+    body: UpdateLabReportTemplateDto,
+  ): Observable<LabReportTemplateSummary> {
+    return this.http.patch<LabReportTemplateSummary>(
+      `/api/admin/lab-report-templates/${id}`,
+      body,
+    );
+  }
+}

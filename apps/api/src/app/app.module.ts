@@ -5,6 +5,11 @@ import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FeeCatalogItemEntity } from './fee-catalog/fee-catalog-item.entity';
 import { FeeCatalogModule } from './fee-catalog/fee-catalog.module';
+import { TrialSettingsEntity } from './trial/trial-settings.entity';
+import { TrialModule } from './trial/trial.module';
+import { LabReportRecordEntity } from './lab-reports/lab-report-record.entity';
+import { LabReportTemplateEntity } from './lab-reports/lab-report-template.entity';
+import { LabReportsModule } from './lab-reports/lab-reports.module';
 import { PatientFeeLineEntity } from './patient-fees/patient-fee-line.entity';
 import { PatientFeesModule } from './patient-fees/patient-fees.module';
 import { PatientEntity } from './patients/patient.entity';
@@ -30,6 +35,9 @@ import { UsersModule } from './users/users.module';
           PatientEntity,
           FeeCatalogItemEntity,
           PatientFeeLineEntity,
+          LabReportTemplateEntity,
+          LabReportRecordEntity,
+          TrialSettingsEntity,
         ],
         synchronize: config.get<string>('TYPEORM_SYNC', 'true') === 'true',
       }),
@@ -40,6 +48,8 @@ import { UsersModule } from './users/users.module';
     FeeCatalogModule,
     PatientFeesModule,
     DashboardModule,
+    LabReportsModule,
+    TrialModule,
   ],
 })
 export class AppModule {}

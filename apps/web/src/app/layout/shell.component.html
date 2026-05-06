@@ -2,10 +2,28 @@
   <header class="shell-header">
     <p-menubar [model]="menuModel()" styleClass="border-noround shell-menubar">
       <ng-template pTemplate="start">
-        <a [routerLink]="auth.homePath()" class="shell-brand" [attr.title]="branding.productName">
-          <span class="shell-brand-short">{{ branding.productShortName }}</span>
-          <span class="shell-brand-full">{{ branding.productName }}</span>
-        </a>
+        <div class="shell-start-cluster">
+          <a [routerLink]="auth.homePath()" class="shell-brand" [attr.title]="branding.productName">
+            <span class="shell-brand-short">{{ branding.productShortName }}</span>
+            <span class="shell-brand-full">{{ branding.productName }}</span>
+          </a>
+          @if (trial.trialEnabled() && !trial.expired()) {
+            @if (trial.status(); as st) {
+              <span
+                class="trial-countdown"
+                [attr.title]="'Trial ends ' + (st.endsAt | date: 'full')"
+              >
+                <span class="trial-label">Trial</span>
+                <span class="trial-sep">·</span>
+                <span>ends {{ st.endsAt | date: 'mediumDate' }}</span>
+                <span class="trial-sep">·</span>
+                <strong>{{ trial.countdownText() }}</strong> left
+              </span>
+            } @else {
+              <span class="trial-countdown trial-muted">Loading trial…</span>
+            }
+          }
+        </div>
       </ng-template>
     </p-menubar>
   </header>

@@ -13,6 +13,7 @@ import Aura from '@primeng/themes/aura';
 import { appRoutes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
 import { AuthService } from './core/auth.service';
+import { TrialService } from './core/trial.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,9 +27,13 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     MessageService,
-    provideAppInitializer(() => {
+    provideAppInitializer(async () => {
+      // Resolve inject() before any `await` — async continuation loses injection context (NG0203).
+      const trial = inject(TrialService);
       const auth = inject(AuthService);
-      return auth.initFromStorage();
+      await trial.refresh();
+      trial.initPolling();
+      await auth.initFromStorage();
     }),
   ],
 };

@@ -5,7 +5,7 @@ Monorepo layout:
 - `apps/api` — NestJS REST API (`/api` prefix), PostgreSQL + TypeORM, JWT auth, role-based access
 - `apps/web` — Angular + PrimeNG SPA
 - `libs/shared` — Shared TypeScript types (`@hospital/shared`)
-- [`docker-compose.yml`](docker-compose.yml) — local **PostgreSQL** in Docker (recommended for development)
+- `[docker-compose.yml](docker-compose.yml)` — local **PostgreSQL** in Docker (recommended for development)
 
 ## Full setup from scratch (Docker + DB viewer + application)
 
@@ -50,15 +50,17 @@ From the repo root:
 cp .env.example .env
 ```
 
-Edit [`.env`](.env) if needed. Defaults match [`docker-compose.yml`](docker-compose.yml):
+Edit `[.env](.env)` if needed. Defaults match `[docker-compose.yml](docker-compose.yml)`:
 
-| Variable   | Typical local value |
-|------------|---------------------|
-| `DB_HOST`  | `localhost`         |
-| `DB_PORT`  | `5432`              |
-| `DB_USER`  | `postgres`          |
-| `DB_PASS`  | `postgres`          |
-| `DB_NAME`  | `hospital`          |
+
+| Variable  | Typical local value |
+| --------- | ------------------- |
+| `DB_HOST` | `localhost`         |
+| `DB_PORT` | `5432`              |
+| `DB_USER` | `postgres`          |
+| `DB_PASS` | `postgres`          |
+| `DB_NAME` | `hospital`          |
+
 
 For first-time local development, keep `TYPEORM_SYNC=true` so TypeORM creates tables when the API starts. Set a real `JWT_SECRET` before any shared or production deployment.
 
@@ -117,17 +119,19 @@ npm run start:api
 npm run start:web
 ```
 
-Then open the URL shown for the web app (usually **`http://localhost:4200`**). The dev server proxies `/api` to **`http://localhost:3000`**.
+Then open the URL shown for the web app (usually `**http://localhost:4200**`). The dev server proxies `/api` to `**http://localhost:3000**`.
 
 ### 8. Sign in
 
 Use the seeded accounts (created when the API starts against an empty `users` table):
 
-| Role         | Email                      | Password   |
-|--------------|----------------------------|------------|
-| Admin        | `admin@hospital.local`     | `admin123` |
+
+| Role         | Email                      | Password    |
+| ------------ | -------------------------- | ----------- |
+| Admin        | `admin@hospital.local`     | `admin123`  |
 | Receptionist | `reception@hospital.local` | `recept123` |
-| Lab          | `lab@hospital.local`       | `lab12345` |
+| Lab          | `lab@hospital.local`       | `lab12345`  |
+
 
 Change passwords before any real deployment.
 
@@ -139,7 +143,7 @@ Change passwords before any real deployment.
 
 ### Troubleshooting
 
-- **`ECONNREFUSED` / login 500 / API won’t start:** Postgres is not running or not ready — run `docker compose up -d` and check `docker compose ps`.
+- `**ECONNREFUSED` / login 500 / API won’t start:** Postgres is not running or not ready — run `docker compose up -d` and check `docker compose ps`.
 - **Port 5432 already in use:** another PostgreSQL is bound to `5432`. Either stop it, or change the **left** side of the port mapping in `docker-compose.yml` (e.g. `'5433:5432'`) and set `DB_PORT=5433` in `.env`.
 - **Nx / Docker “no such service” errors:** run **one command per line**; do not paste `# comments` on the same line as `docker compose` or `npm` commands.
 
@@ -147,16 +151,18 @@ Change passwords before any real deployment.
 
 ## Configuration (quick reference)
 
-1. Copy [`.env.example`](.env.example) to `.env` at the repo root (or edit the generated `.env`).
-2. Ensure `DB_*` and `JWT_SECRET` are set. `TYPEORM_SYNC=true` auto-creates tables in development.
+1. Copy `[.env.example](.env.example)` to `.env` at the repo root (or edit the generated `.env`).
+2. Ensure `DB_`* and `JWT_SECRET` are set. `TYPEORM_SYNC=true` auto-creates tables in development.
 
 ## Default logins (seeded on API startup)
 
-| Role          | Email                     | Password   |
-|---------------|---------------------------|------------|
-| Admin         | `admin@hospital.local`    | `admin123` |
-| Receptionist  | `reception@hospital.local`| `recept123` |
-| Lab           | `lab@hospital.local`      | `lab12345` |
+
+| Role         | Email                      | Password    |
+| ------------ | -------------------------- | ----------- |
+| Admin        | `admin@hospital.local`     | `admin123`  |
+| Receptionist | `reception@hospital.local` | `recept123` |
+| Lab          | `lab@hospital.local`       | `lab12345`  |
+
 
 Change these before any production use.
 
@@ -180,7 +186,13 @@ npm run start:api
 npm run start:web
 ```
 
-Open **`http://localhost:4200`** (typical). The dev proxy forwards `/api` to **`http://localhost:3000`**.
+Open `**http://localhost:4200**` (typical). The dev proxy forwards `/api` to `**http://localhost:3000**`.
+
+### Windows one-click launcher
+
+Scripts under [`scripts/windows/`](scripts/windows/) start Docker if needed, run `docker compose up -d`, open a new window with `npm start`, wait for ports 3000/4200, then open the browser. See [`scripts/windows/README.md`](scripts/windows/README.md). To add a Desktop shortcut, run once from the repo root:
+
+`powershell -ExecutionPolicy Bypass -File .\scripts\windows\install-desktop-shortcut.ps1`
 
 **Use a different address in the browser (not `localhost`):**
 
@@ -191,7 +203,7 @@ Open **`http://localhost:4200`** (typical). The dev proxy forwards `/api` to **`
 
 **Different port:** `nx serve web --port=4300` then use `http://localhost:4300/`.
 
-**Change home routes:** edit [`apps/web/src/app/app.routes.ts`](apps/web/src/app/app.routes.ts) and [`apps/web/src/app/core/auth.service.ts`](apps/web/src/app/core/auth.service.ts) (`homePath()`).
+**Change home routes:** edit `[apps/web/src/app/app.routes.ts](apps/web/src/app/app.routes.ts)` and `[apps/web/src/app/core/auth.service.ts](apps/web/src/app/core/auth.service.ts)` (`homePath()`).
 
 ### Using a domain name (not only localhost)
 
@@ -203,18 +215,20 @@ The app does not hardcode `localhost` in the UI. For a real hostname (for exampl
 4. **API on the same host** — Prefer one origin: reverse-proxy `/api` to the Nest app (port 3000 internally). The SPA already calls relative URLs like `/api/...`, so no code change is needed if web and API share the same domain.
 5. **API on another host** — You would add a production `environment` with an absolute API base URL and point `HttpClient` at it (not configured in this repo by default).
 
-**Local dev:** To hit a remote API from `ng serve`, edit [`apps/web/proxy.conf.json`](apps/web/proxy.conf.json) and set `"target"` to that API base (including `https://` if applicable).
+**Local dev:** To hit a remote API from `ng serve`, edit `[apps/web/proxy.conf.json](apps/web/proxy.conf.json)` and set `"target"` to that API base (including `https://` if applicable).
 
-**Branding** (product name, Malgray credit, site, phone) is centralized in [`apps/web/src/app/core/branding.ts`](apps/web/src/app/core/branding.ts) for the shell, login, browser title, and printed slips.
+**Branding** (product name, Malgray credit, site, phone) is centralized in `[apps/web/src/app/core/branding.ts](apps/web/src/app/core/branding.ts)` for the shell, login, browser title, and printed slips.
 
 ## Features
 
+- **Trial mode (optional):** set `TRIAL_MODE=true` in `.env` for a time-limited build. The API stores `trial_ends_at` (defaults to **5 days** from first start, overridable with `TRIAL_DAYS`). After expiry, all API calls except `GET /api/trial/status` and `PATCH /api/trial/manage` (with header `X-MGL-Trial-Recovery: <TRIAL_ADMIN_TOKEN>`) return **403** with `TRIAL_EXPIRED`. The Angular shell shows a **trial countdown**; login shows an end-of-trial message. A **recovery URL** is not linked in the UI: path segment comes from `[apps/web/src/environments/environment.ts](apps/web/src/environments/environment.ts)` (`trialMgmtPath`, default `svc-vq8m-k3nz7xp2`) — change it per customer and/or use build-time file replacement so it is not obvious in the shipped bundle. Example: `https://your-host/svc-vq8m-k3nz7xp2` (or your custom path) to extend the trial or set a new end date.
 - **Admin / Receptionist / Lab** login via JWT; each role receives a `permissions` list from the API (see `libs/shared/src/lib/permissions.ts`).
 - **Register patient** (admin + receptionist); **delete patient** (admin only); **lab** can look up patients and the active fee catalog but not register patients, print slips, or manage charges.
 - **Patient list** with search; **A4 registration slip** (`/patients/:id/print`, Life Care branding + logo)
 - **Fee catalog (admin):** add/edit/deactivate services (X-ray, lab, radiology, etc.) under **Admin → Fee catalog** (`/admin/fee-catalog`). Default items are seeded on first empty catalog.
 - **Per-patient charges:** on a patient’s detail page, **Add charge** from the price list or as a **custom** line; **Edit** (pencil) updates quantity, unit price, and description (description only for custom lines). **Fee slip (A4)** (`/patients/:id/fees-print`) and **Charges POS receipt** (`/patients/:id/fees-print-pos`, ~80mm thermal-style layout, separate from registration slip) list lines and total.
-- **Dashboards:** **Admin** (`/admin/dashboard`) — full stats from `GET /api/dashboard/overview`. **Reception** (`/reception/desk`) — front-desk snapshot from `GET /api/dashboard/reception-desk`. **Lab** (`/lab`) — placeholder workspace from `GET /api/dashboard/lab-bench`. Legacy URL `/dashboard` redirects to `/admin/dashboard`.
+- **Dashboards:** **Admin** (`/admin/dashboard`) — full stats from `GET /api/dashboard/overview`. **Reception** (`/reception/desk`) — front-desk snapshot from `GET /api/dashboard/reception-desk`. **Lab** (`/lab`) — workspace intro from `GET /api/dashboard/lab-bench` (lab tech + admin). Legacy URL `/dashboard` redirects to `/admin/dashboard`.
+- **Lab / radiology reports:** templates are seeded from the same names as the sample Word files in `[report-template/](report-template/)` (see `apps/api/src/app/lab-reports/lab-reports.service.ts`). Technicians use **Lab reports** (`/lab/reports`): pick a template, enter **MRN and patient name manually**, fill structured fields, then **Save & print** (Life Care–style A4). **Admin → Lab report templates** links each template to a **fee catalog** row so billing knows which service applies.
 - **Admin → Users** lists seeded staff (`GET /api/admin/users`)
 
 ### API (fees)
@@ -223,11 +237,25 @@ The app does not hardcode `localhost` in the UI. For a real hostname (for exampl
 - `GET|POST|PATCH|DELETE /api/admin/fee-catalog` — full catalog management (admin)
 - `GET|POST|PATCH|DELETE /api/patients/:patientId/fees` — list/add/update/remove charge lines (admin + receptionist). `PATCH …/fees/:lineId` accepts `quantity`, `unitPrice`, and optional `description` only when the line is **not** tied to a catalog item.
 
+### API (trial)
+
+- `GET /api/trial/status` — public; `{ trialEnabled, expired, endsAt, serverNow, msRemaining }` (no JWT).
+- `PATCH /api/trial/manage` — public but requires header `X-MGL-Trial-Recovery` equal to `TRIAL_ADMIN_TOKEN`; body `{ trialEndsAt?: ISO }` and/or `{ extendDays?: number }`.
+
 ### API (dashboard)
 
 - `GET /api/dashboard/overview` — full operations overview (**admin only**).
 - `GET /api/dashboard/reception-desk` — reception snapshot (**receptionist only**).
-- `GET /api/dashboard/lab-bench` — lab workspace placeholder (**lab only**).
+- `GET /api/dashboard/lab-bench` — lab workspace intro (**lab tech + admin**).
+
+### API (lab reports)
+
+- `GET /api/lab/report-templates` — active templates (lab tech + admin)
+- `POST /api/lab/report-records` — save a filled report (lab tech + admin)
+- `GET /api/lab/report-records` — recent saved reports
+- `GET /api/lab/report-records/:id` — one report (for print view)
+- `GET /api/admin/lab-report-templates` — all templates including inactive (**admin**)
+- `PATCH /api/admin/lab-report-templates/:id` — link fee catalog item and/or set `isActive` (**admin**)
 
 ## Build
 
@@ -243,27 +271,29 @@ Staff and browsers only need the **running application** and **database**. They 
 
 ### What you deploy vs what you keep private
 
-| Keep on **your** machine (or secure dev/CI) | Put on the **hospital server** only |
-|---------------------------------------------|--------------------------------------|
-| Full monorepo, Git history, IDE             | Production **build output** + config |
-| `apps/web/src`, `apps/api/src`, `libs/`     | `dist/apps/web/browser/` (static site) |
-|                                             | `dist/apps/api/` (compiled Node API) + `node_modules` from `npm ci` in that folder |
-|                                             | PostgreSQL data directory (or Docker volume) |
 
-- **Angular:** `npm run build` uses the **production** configuration: minified bundles, **no source maps** in output (see `sourceMap` in [`apps/web/project.json`](apps/web/project.json)). The browser downloads JavaScript that is hard to read and is **not** your original TypeScript project layout.
-- **Nest API:** Production webpack builds with **source maps disabled** (see [`apps/api/webpack.config.js`](apps/api/webpack.config.js)) so `.map` files are not shipped; only compiled JS runs on the server.
+| Keep on **your** machine (or secure dev/CI) | Put on the **hospital server** only                                                |
+| ------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Full monorepo, Git history, IDE             | Production **build output** + config                                               |
+| `apps/web/src`, `apps/api/src`, `libs/`     | `dist/apps/web/browser/` (static site)                                             |
+|                                             | `dist/apps/api/` (compiled Node API) + `node_modules` from `npm ci` in that folder |
+|                                             | PostgreSQL data directory (or Docker volume)                                       |
+
+
+- **Angular:** `npm run build` uses the **production** configuration: minified bundles, **no source maps** in output (see `sourceMap` in `[apps/web/project.json](apps/web/project.json)`). The browser downloads JavaScript that is hard to read and is **not** your original TypeScript project layout.
+- **Nest API:** Production webpack builds with **source maps disabled** (see `[apps/api/webpack.config.js](apps/api/webpack.config.js)`) so `.map` files are not shipped; only compiled JS runs on the server.
 
 Anyone with server disk access could still open the compiled `.js` files (minified/obfuscated logic), but that is **not** the same as handing them your full source tree, tests, and history. True protection of intellectual property is legal + access control + building on a machine they never see.
 
 ### Suggested on-site architecture
 
 1. **One PC or small server** on the hospital LAN (Windows or Linux) with **Node.js LTS** and **PostgreSQL** (or PostgreSQL in Docker on that same machine only).
-2. On **your** office machine: clone the repo, set production `.env` (`JWT_SECRET`, strong DB password, **`TYPEORM_SYNC=false`** after first migration — do not rely on auto-sync in production), run `npm run build`.
+2. On **your** office machine: clone the repo, set production `.env` (`JWT_SECRET`, strong DB password, `**TYPEORM_SYNC=false`** after first migration — do not rely on auto-sync in production), run `npm run build`.
 3. Copy to the hospital machine **only**:
-   - `dist/apps/web/browser/` (entire folder),
-   - `dist/apps/api/` (main.js, assets, generated `package.json`),
-   - install production deps: `cd dist/apps/api && npm ci` (or `npm install --omit=dev` per your lockfile workflow),
-   - `.env` (secrets — not committed to Git).
+  - `dist/apps/web/browser/` (entire folder),
+  - `dist/apps/api/` (main.js, assets, generated `package.json`),
+  - install production deps: `cd dist/apps/api && npm ci` (or `npm install --omit=dev` per your lockfile workflow),
+  - `.env` (secrets — not committed to Git).
 4. **Run the API:** `node main.js` (or use **PM2** / **Windows Service** / systemd so it restarts on reboot).
 5. **Serve the SPA:** **Nginx** or **IIS** (or `nx run web:serve-static` is fine for a small LAN) pointing document root at `dist/apps/web/browser`, with `try_files` / URL rewrite so Angular routes work, and **reverse-proxy `/api`** to `http://127.0.0.1:3000` so the browser never needs a separate API hostname.
 6. **Reception PCs:** only a browser bookmark to `http://hospital-server` or `https://his.local` — no Node, no repo, no source.

@@ -1,0 +1,50 @@
+<p-card header="Recent reports">
+  <p-button
+    label="New report"
+    icon="pi pi-plus"
+    [text]="true"
+    routerLink="/lab/reports"
+    class="mb-2"
+  />
+  @if (loading()) {
+    <div class="rc-loading">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+  } @else {
+    <p-table [value]="rows()" [tableStyle]="{ 'min-width': '42rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Template</th>
+          <th>MRN</th>
+          <th>Patient</th>
+          <th>By</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          <td>{{ r.createdAt | date: 'short' }}</td>
+          <td>{{ r.templateTitle }}</td>
+          <td>{{ r.patientMrn }}</td>
+          <td>{{ r.patientName }}</td>
+          <td>{{ r.createdByName || '—' }}</td>
+          <td>
+            <p-button
+              icon="pi pi-print"
+              [rounded]="true"
+              [text]="true"
+              [routerLink]="['/lab/reports/print', r.id]"
+              ariaLabel="Print"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">No saved reports yet.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</p-card>

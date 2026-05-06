@@ -1,5 +1,16 @@
 <div class="login-wrap">
   <p-toast />
+  @if (trialEndedBanner) {
+    <p class="trial-alert" role="alert">
+      Trial period has ended. Please contact <strong>Malgray Labs</strong> for
+      activation.
+    </p>
+  }
+  @if (trial.trialEnabled() && !trial.expired()) {
+    <p class="trial-chip-login">
+      Trial time remaining: <strong>{{ trial.countdownText() }}</strong>
+    </p>
+  }
   <header class="login-brand">
     <h1 class="login-product">{{ branding.productName }}</h1>
     <p class="login-vendor">

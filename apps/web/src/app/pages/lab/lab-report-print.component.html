@@ -1,0 +1,82 @@
+<div class="no-print toolbar">
+  <p-button label="Print" icon="pi pi-print" (onClick)="triggerPrint()" />
+  <p-button
+    label="Back"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    (onClick)="back()"
+  />
+</div>
+
+@if (record(); as r) {
+  <div class="print-area life-care-slip lab-doc">
+    <header class="lc-top">
+      <div class="lc-brand-row">
+        <div class="lc-en-title">THE LIFE CARE MEDICAL CENTER</div>
+        <div class="lc-logo-wrap">
+          <img
+            class="lc-logo-img"
+            src="/assets/life-care-logo.jpeg"
+            alt="THE LIFE CARE"
+          />
+        </div>
+        <div class="lc-ur-title" dir="rtl">دی لائف کیئر میڈیکل سینٹر</div>
+      </div>
+      <div class="lc-black-bar">
+        Opposite Pin School Main Makhad Road Jand, District Attock &nbsp;·&nbsp;
+        0345-0000000
+      </div>
+      <div class="lc-pills">
+        <span class="lc-pill" dir="rtl">لیباریٹری</span>
+        <span class="lc-pill" dir="rtl">الٹراساؤنڈ</span>
+        <span class="lc-pill" dir="rtl">ایکس رے</span>
+      </div>
+    </header>
+
+    <h1 class="lab-doc-title">{{ r.templateTitle }}</h1>
+
+    <section class="lc-patient-block lab-doc-meta">
+      <div class="lc-ref-date">
+        <div class="lc-field-inline">
+          <span class="lc-label">Ref# / MRN</span>
+          <span class="lc-line lc-line-fill">{{ r.patientMrn }}</span>
+        </div>
+        <div class="lc-field-inline lc-field-right">
+          <span class="lc-label">Date</span>
+          <span class="lc-line lc-line-fill">{{
+            printedAt() | date: 'dd/MM/yyyy'
+          }}</span>
+        </div>
+      </div>
+      <div class="lc-field-row">
+        <span class="lc-label">Patient's Name</span>
+        <span class="lc-line lc-line-fill lc-line-long">{{ r.patientName }}</span>
+      </div>
+      @if (r.createdByName) {
+        <div class="lc-field-row lab-tech-line">
+          <span class="lc-label">Prepared by</span>
+          <span class="lc-line lc-line-fill lc-line-long">{{ r.createdByName }}</span>
+        </div>
+      }
+    </section>
+
+    <div class="lc-rule"></div>
+
+    @for (f of orderedFields(r.fieldsSchema); track f.key) {
+      <section class="lab-field-block">
+        <h2 class="lab-field-title">{{ f.label }}</h2>
+        <div class="lab-field-body">{{ fieldValue(f.key) }}</div>
+      </section>
+    }
+
+    <div class="lab-sig-block">
+      <div class="lab-sig-line"></div>
+      <div class="lab-sig-label">Radiologist / Sonologist / Technician</div>
+    </div>
+
+    <p class="lc-system-footer">
+      {{ branding.productShortName }} — {{ branding.designedByLine }} ·
+      {{ branding.companyWebsiteDisplay }} · {{ branding.supportPhoneDisplay }}
+    </p>
+  </div>
+}

@@ -1,0 +1,51 @@
+<p-toast />
+<div class="tr-wrap">
+  <p-card header="Trial period (recovery)">
+    <p class="hint">
+      This page is not linked from the application. Use the URL you were given
+      together with the recovery token from your environment file
+      (<code>TRIAL_ADMIN_TOKEN</code>). You can set an absolute end date or extend
+      by a number of days from the current end (or from now if already expired).
+    </p>
+    @if (status(); as s) {
+      <p class="status-line">
+        @if (!s.trialEnabled) {
+          <strong>Trial mode is off</strong> (API <code>TRIAL_MODE</code> is not
+          <code>true</code>).
+        } @else if (s.expired) {
+          <strong>Trial has ended.</strong> Ends at: {{ s.endsAt }} (server time:
+          {{ s.serverNow }}).
+        } @else {
+          <strong>Trial active.</strong> Ends: {{ s.endsAt }} · Remaining (approx.):
+          {{ trialMain.countdownText() }}
+        }
+      </p>
+    }
+    <div class="tr-fields">
+      <label class="blk" for="tok">Recovery token</label>
+      <p-password
+        inputId="tok"
+        [(ngModel)]="recoveryToken"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+      <label class="blk" for="d">New end (local date/time)</label>
+      <input pInputText id="d" type="datetime-local" [(ngModel)]="trialEndsAt" class="w-full" />
+      <label class="blk" for="ex">Or extend by days</label>
+      <p-inputNumber
+        inputId="ex"
+        [(ngModel)]="extendDays"
+        [min]="1"
+        [showButtons]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </div>
+    <div class="tr-actions">
+      <p-button label="Refresh status" icon="pi pi-refresh" (onClick)="reloadStatus()" />
+      <p-button label="Apply" icon="pi pi-check" (onClick)="apply()" />
+    </div>
+  </p-card>
+</div>

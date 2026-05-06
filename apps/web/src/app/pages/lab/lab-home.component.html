@@ -14,9 +14,23 @@
       <h1 class="lab-title">{{ b.title }}</h1>
       <p class="lab-sub">Updated {{ b.generatedAt | date: 'medium' }}</p>
     </div>
-    <p-button label="Patient lookup" icon="pi pi-users" routerLink="/patients" />
+    <div class="lab-actions">
+      <p-button label="Patient lookup" icon="pi pi-users" routerLink="/patients" />
+      <p-button
+        label="Lab reports"
+        icon="pi pi-file-edit"
+        routerLink="/lab/reports"
+      />
+      <p-button
+        label="Recent reports"
+        icon="pi pi-history"
+        severity="secondary"
+        [outlined]="true"
+        routerLink="/lab/reports/recent"
+      />
+    </div>
   </div>
-  <p-card [header]="'Coming next'">
+  <p-card [header]="'Lab workspace'">
     <p class="lab-summary">{{ b.summary }}</p>
   </p-card>
 }

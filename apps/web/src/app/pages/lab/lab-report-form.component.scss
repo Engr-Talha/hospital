@@ -1,0 +1,42 @@
+.form-loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.hint {
+  margin: 0 0 1rem;
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+}
+
+.lr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 40rem;
+}
+
+.blk {
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.15rem;
+}
+
+.blk:first-of-type {
+  margin-top: 0;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.err {
+  color: var(--red-500);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}

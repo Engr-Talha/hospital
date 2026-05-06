@@ -4,6 +4,27 @@
   padding: 0 1rem;
 }
 
+.trial-alert {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--p-border-radius-md, 6px);
+  background: var(--p-red-50, #fef2f2);
+  color: var(--p-red-900, #7f1d1d);
+  border: 1px solid var(--p-red-200, #fecaca);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.trial-chip-login {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--p-border-radius-md, 6px);
+  background: var(--p-primary-50, #eff6ff);
+  color: var(--p-primary-900, #1e3a8a);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
 .login-brand {
   text-align: center;
   margin-bottom: 1.25rem;

@@ -1,4 +1,5 @@
-import { Component, computed, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Permission, Role } from '@hospital/shared';
 import { MenuItem } from 'primeng/api';
@@ -6,17 +7,23 @@ import { Menubar } from 'primeng/menubar';
 import { Toast } from 'primeng/toast';
 import { AuthService } from '../core/auth.service';
 import { APP_BRANDING } from '../core/branding';
+import { TrialService } from '../core/trial.service';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterModule, Menubar, Toast],
+  imports: [RouterModule, Menubar, Toast, DatePipe],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })
-export class ShellComponent {
+export class ShellComponent implements OnInit {
   readonly auth = inject(AuthService);
+  readonly trial = inject(TrialService);
 
   readonly branding = APP_BRANDING;
+
+  ngOnInit(): void {
+    void this.trial.refresh();
+  }
 
   readonly menuModel = computed((): MenuItem[] => {
     const u = this.auth.user();
@@ -44,6 +51,13 @@ export class ShellComponent {
         routerLink: ['/patients/new'],
       });
     }
+    if (u?.role === Role.LAB_TECH || u?.role === Role.ADMIN) {
+      items.push({
+        label: 'Lab reports',
+        icon: 'pi pi-file-edit',
+        routerLink: ['/lab/reports'],
+      });
+    }
     if (u?.role === Role.ADMIN) {
       items.push({
         label: 'Admin',
@@ -58,6 +72,11 @@ export class ShellComponent {
             label: 'Fee catalog',
             icon: 'pi pi-list',
             routerLink: ['/admin/fee-catalog'],
+          },
+          {
+            label: 'Lab report templates',
+            icon: 'pi pi-link',
+            routerLink: ['/admin/lab-report-templates'],
           },
         ],
       });

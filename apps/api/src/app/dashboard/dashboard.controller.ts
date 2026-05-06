@@ -19,7 +19,7 @@ export class DashboardController {
     return this.dashboardService.getReceptionDesk();
   }
 
-  @Roles(Role.LAB_TECH)
+  @Roles(Role.LAB_TECH, Role.ADMIN)
   @Get('lab-bench')
   labBench() {
     return this.dashboardService.getLabBench();
