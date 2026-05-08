@@ -84,6 +84,8 @@ export class AuthService {
         return '/reception/desk';
       case Role.LAB_TECH:
         return '/lab';
+      case Role.DOCTOR:
+        return '/patients';
       default:
         return '/login';
     }

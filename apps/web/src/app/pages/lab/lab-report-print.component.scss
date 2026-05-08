@@ -1,16 +1,5 @@
 @use '../patients/life-care-slip-shared' as *;
 
-.lab-doc-title {
-  text-align: center;
-  font-size: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 10px 0 6px;
-  padding: 6px 8px;
-  border: 2px solid #000;
-}
-
 .lab-doc-meta {
   margin-top: 4px;
 }
@@ -39,8 +28,52 @@
   white-space: pre-wrap;
   word-break: break-word;
   min-height: 2.5em;
-  padding: 4px 2px;
-  border: 1px solid #ccc;
+  padding: 4px 0;
+  border: none;
+}
+
+.lab-rich-print {
+  font-size: 10.5px;
+  line-height: 1.4;
+  word-break: break-word;
+  padding: 6px 0;
+  border: none;
+  min-height: 0;
+}
+
+.lab-rich-print ::ng-deep p {
+  margin: 0 0 0.5em;
+}
+
+.lab-rich-print ::ng-deep ul,
+.lab-rich-print ::ng-deep ol {
+  margin: 0 0 0.5em 1.2em;
+  padding: 0;
+}
+
+.lab-rich-print ::ng-deep table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5em 0;
+}
+
+.lab-rich-print ::ng-deep td,
+.lab-rich-print ::ng-deep th {
+  border: 1px solid #999;
+  padding: 2px 4px;
+  font-size: 10px;
+}
+
+.lab-rich-print ::ng-deep img {
+  max-width: 100%;
+  height: auto;
+}
+
+.lab-rich-print ::ng-deep h1,
+.lab-rich-print ::ng-deep h2,
+.lab-rich-print ::ng-deep h3 {
+  font-size: 11px;
+  margin: 0.6em 0 0.3em;
 }
 
 .lab-sig-block {

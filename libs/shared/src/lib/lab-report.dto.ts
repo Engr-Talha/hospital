@@ -1,4 +1,4 @@
-export type LabReportFieldType = 'text' | 'textarea';
+export type LabReportFieldType = 'text' | 'textarea' | 'richtext';
 
 export interface LabReportFieldSchema {
   key: string;

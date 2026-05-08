@@ -71,3 +71,56 @@
 .w-full {
   width: 100%;
 }
+
+.fee-readonly-hint {
+  color: var(--p-text-muted-color, #6c757d);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+.fee-toolbar-readonly {
+  justify-content: flex-end;
+}
+
+.pd-lab-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pd-lab-hint {
+  color: var(--p-text-muted-color, #6c757d);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.pd-lab-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.pd-lab-subhd {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.pd-lab-templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.pd-lab-tpl-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pd-lab-tpl-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}

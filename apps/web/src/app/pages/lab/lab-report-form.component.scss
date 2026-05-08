@@ -40,3 +40,19 @@
   gap: 0.5rem;
   margin-top: 1.25rem;
 }
+
+.lr-ckeditor {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .lr-ckeditor .ck-editor__editable {
+  min-height: 320px;
+}
+
+.lr-field-label {
+  display: block;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.35rem;
+}

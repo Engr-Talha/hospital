@@ -4,6 +4,7 @@ import {
   DashboardOverview,
   LabBenchOverview,
   ReceptionDeskOverview,
+  ReceptionistPerformanceOverview,
 } from '@hospital/shared';
 import { Observable } from 'rxjs';
 
@@ -13,6 +14,12 @@ export class DashboardService {
 
   overview(): Observable<DashboardOverview> {
     return this.http.get<DashboardOverview>('/api/dashboard/overview');
+  }
+
+  receptionistPerformance(): Observable<ReceptionistPerformanceOverview> {
+    return this.http.get<ReceptionistPerformanceOverview>(
+      '/api/dashboard/receptionists',
+    );
   }
 
   receptionDesk(): Observable<ReceptionDeskOverview> {

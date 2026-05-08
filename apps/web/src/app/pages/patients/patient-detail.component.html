@@ -44,19 +44,20 @@
     <dl class="grid-dl">
       <dt>Gender</dt>
       <dd><p-tag [value]="p.gender" /></dd>
-      <dt>Date of birth</dt>
-      <dd>{{ p.dob }}</dd>
+      <dt>Age (years)</dt>
+      <dd>{{ p.age }}</dd>
       <dt>Phone</dt>
       <dd>{{ p.phone || '—' }}</dd>
       <dt>Blood group</dt>
       <dd>{{ p.bloodGroup || '—' }}</dd>
       <dt>Address</dt>
       <dd>{{ p.address || '—' }}</dd>
-      <dt>Emergency contact</dt>
+      <dt>Appointment doctor</dt>
       <dd>
-        {{ p.emergencyContactName || '—' }}
-        @if (p.emergencyContactPhone) {
-          <span> · {{ p.emergencyContactPhone }}</span>
+        @if (p.appointmentDoctor) {
+          {{ p.appointmentDoctor.name }} — {{ p.appointmentDoctor.medicalField }}
+        } @else {
+          —
         }
       </dd>
       <dt>Notes</dt>
@@ -74,16 +75,122 @@
     </dl>
   </p-card>
 
-  @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+  @if (showPatientLabSection()) {
+    <p-card header="Laboratory" class="mt-card">
+      @if (canCreateLabReports()) {
+        <div class="pd-lab-toolbar">
+          <p-button
+            label="All report templates"
+            icon="pi pi-list"
+            routerLink="/lab/reports"
+          />
+          <p-button
+            label="Lab workspace"
+            icon="pi pi-flask"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/lab"
+          />
+        </div>
+      }
+      <p class="pd-lab-hint">
+        Reports for MRN <strong>{{ p.mrn }}</strong>.
+        @if (canCreateLabReports()) {
+          Open a template below to add a report (patient details are prefilled).
+        } @else {
+          View or print saved reports. Reception cannot enter new lab reports here.
+        }
+      </p>
+      @if (labLoading()) {
+        <div class="pd-lab-loading">
+          <p-progressSpinner strokeWidth="4" />
+        </div>
+      } @else {
+        <h3 class="pd-lab-subhd">Reports on file</h3>
+        <p-table
+          [value]="labRecords()"
+          [tableStyle]="{ 'min-width': '100%' }"
+          styleClass="pd-lab-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Report type</th>
+              <th>Date</th>
+              <th>Entered by</th>
+              <th style="width: 6rem"></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.templateTitle }}</td>
+              <td>{{ row.createdAt | date: 'medium' }}</td>
+              <td>{{ row.createdByName || '—' }}</td>
+              <td>
+                <p-button
+                  icon="pi pi-eye"
+                  [rounded]="true"
+                  [text]="true"
+                  [routerLink]="['/lab/reports/print', row.id]"
+                  ariaLabel="View report"
+                />
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">No lab reports for this MRN yet.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        @if (canCreateLabReports()) {
+          <h3 class="pd-lab-subhd">New report</h3>
+          <div class="pd-lab-templates">
+            @for (t of labTemplates(); track t.id) {
+              <p-card styleClass="pd-lab-tpl-card">
+                <div class="pd-lab-tpl-inner">
+                  <span class="pd-lab-tpl-title">{{ t.title }}</span>
+                  <p-button
+                    label="Fill report"
+                    icon="pi pi-pencil"
+                    size="small"
+                    [routerLink]="['/lab/reports/new', t.id]"
+                    [queryParams]="{
+                      patientMrn: p.mrn,
+                      patientName: patientDisplayName(p),
+                    }"
+                  />
+                </div>
+              </p-card>
+            }
+          </div>
+        }
+      }
+    </p-card>
+  }
+
+  @if (
+    auth.user()?.role !== Role.DOCTOR &&
+    auth.hasPermission(Permission.PATIENT_VIEW)
+  ) {
   <p-card header="Charges & fees" class="mt-card">
-    <div class="fee-toolbar">
-      <p-button
-        label="Add charge"
-        icon="pi pi-plus"
-        (onClick)="openAddFee()"
-      />
-      <span class="fee-total">Total: <strong>{{ feeTotal() }}</strong></span>
-    </div>
+    @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+      <div class="fee-toolbar">
+        <p-button
+          label="Add charge"
+          icon="pi pi-plus"
+          (onClick)="openAddFee()"
+        />
+        <span class="fee-total">Total: <strong>{{ feeTotal() }}</strong></span>
+      </div>
+    } @else {
+      <p class="fee-readonly-hint">
+        View only — reception posts charges.
+      </p>
+      <div class="fee-toolbar fee-toolbar-readonly">
+        <span class="fee-total">Total: <strong>{{ feeTotal() }}</strong></span>
+      </div>
+    }
     <p-table [value]="feeLines()" [tableStyle]="{ 'min-width': '36rem' }">
       <ng-template pTemplate="header">
         <tr>
@@ -92,7 +199,9 @@
           <th>Unit</th>
           <th>Line total</th>
           <th>By</th>
-          <th style="width: 16rem">Actions</th>
+          @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+            <th style="width: 16rem">Actions</th>
+          }
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-row>
@@ -102,35 +211,43 @@
           <td>{{ row.unitPrice }}</td>
           <td>{{ row.lineTotal }}</td>
           <td>{{ row.createdByName || '—' }}</td>
-          <td class="fee-actions">
-            <p-button
-              label="Print"
-              icon="pi pi-print"
-              [text]="true"
-              (onClick)="printFeeLine(row)"
-              ariaLabel="Print charge"
-            />
-            <p-button
-              label="Edit"
-              icon="pi pi-pencil"
-              [text]="true"
-              (onClick)="openEditFee(row)"
-              ariaLabel="Edit"
-            />
-            <p-button
-              label="Delete"
-              icon="pi pi-trash"
-              [text]="true"
-              severity="danger"
-              (onClick)="removeFee(row)"
-              ariaLabel="Remove"
-            />
-          </td>
+          @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+            <td class="fee-actions">
+              <p-button
+                label="Print"
+                icon="pi pi-print"
+                [text]="true"
+                (onClick)="printFeeLine(row)"
+                ariaLabel="Print charge"
+              />
+              <p-button
+                label="Edit"
+                icon="pi pi-pencil"
+                [text]="true"
+                (onClick)="openEditFee(row)"
+                ariaLabel="Edit"
+              />
+              <p-button
+                label="Delete"
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                (onClick)="removeFee(row)"
+                ariaLabel="Remove"
+              />
+            </td>
+          }
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6">No charges yet. Use “Add charge”.</td>
+          <td [attr.colspan]="auth.hasPermission(Permission.FEE_LINE_MANAGE) ? 6 : 5">
+            @if (auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+              No charges yet. Use “Add charge”.
+            } @else {
+              No charges recorded.
+            }
+          </td>
         </tr>
       </ng-template>
     </p-table>

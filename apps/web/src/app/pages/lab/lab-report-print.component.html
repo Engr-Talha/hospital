@@ -1,5 +1,20 @@
 <div class="no-print toolbar">
-  <p-button label="Print" icon="pi pi-print" (onClick)="triggerPrint()" />
+  <p-button
+    label="Save PDF"
+    icon="pi pi-download"
+    [loading]="pdfBusy()"
+    [disabled]="!record()"
+    (onClick)="downloadPdf()"
+  />
+  <p-button
+    label="Print"
+    icon="pi pi-print"
+    [loading]="pdfBusy()"
+    [disabled]="!record()"
+    (onClick)="openPdfForPrint()"
+    pTooltip="Opens a PDF copy without the browser web address; print from the PDF viewer."
+    tooltipPosition="bottom"
+  />
   <p-button
     label="Back"
     icon="pi pi-arrow-left"
@@ -9,7 +24,7 @@
 </div>
 
 @if (record(); as r) {
-  <div class="print-area life-care-slip lab-doc">
+  <div #printRoot class="print-area life-care-slip lab-doc">
     <header class="lc-top">
       <div class="lc-brand-row">
         <div class="lc-en-title">THE LIFE CARE MEDICAL CENTER</div>
@@ -32,8 +47,6 @@
         <span class="lc-pill" dir="rtl">ایکس رے</span>
       </div>
     </header>
-
-    <h1 class="lab-doc-title">{{ r.templateTitle }}</h1>
 
     <section class="lc-patient-block lab-doc-meta">
       <div class="lc-ref-date">
@@ -62,11 +75,15 @@
 
     <div class="lc-rule"></div>
 
-    @for (f of orderedFields(r.fieldsSchema); track f.key) {
-      <section class="lab-field-block">
-        <h2 class="lab-field-title">{{ f.label }}</h2>
-        <div class="lab-field-body">{{ fieldValue(f.key) }}</div>
-      </section>
+    @if (hasRichBody()) {
+      <section class="lab-rich-print" [innerHTML]="richBodyHtml()"></section>
+    } @else {
+      @for (f of orderedFields(r.fieldsSchema); track f.key) {
+        <section class="lab-field-block">
+          <h2 class="lab-field-title">{{ f.label }}</h2>
+          <div class="lab-field-body">{{ fieldValue(f.key) }}</div>
+        </section>
+      }
     }
 
     <div class="lab-sig-block">

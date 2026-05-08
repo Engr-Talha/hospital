@@ -36,7 +36,7 @@
       <th>MRN</th>
       <th>Name</th>
       <th>Gender</th>
-      <th>DOB</th>
+      <th>Age</th>
       <th>Phone</th>
       <th style="width: 12rem">Actions</th>
     </tr>
@@ -46,7 +46,7 @@
       <td>{{ p.mrn }}</td>
       <td>{{ p.firstName }} {{ p.lastName }}</td>
       <td><p-tag [value]="p.gender" severity="info" /></td>
-      <td>{{ p.dob }}</td>
+      <td>{{ p.age }}</td>
       <td>{{ p.phone || '—' }}</td>
       <td>
         <p-button

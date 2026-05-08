@@ -14,6 +14,8 @@ import { PatientFeeLineEntity } from './patient-fees/patient-fee-line.entity';
 import { PatientFeesModule } from './patient-fees/patient-fees.module';
 import { PatientEntity } from './patients/patient.entity';
 import { PatientsModule } from './patients/patients.module';
+import { DoctorEntity } from './doctors/doctor.entity';
+import { DoctorsModule } from './doctors/doctors.module';
 import { UserEntity } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 
@@ -38,6 +40,7 @@ import { UsersModule } from './users/users.module';
           LabReportTemplateEntity,
           LabReportRecordEntity,
           TrialSettingsEntity,
+          DoctorEntity,
         ],
         synchronize: config.get<string>('TYPEORM_SYNC', 'true') === 'true',
       }),
@@ -50,6 +53,7 @@ import { UsersModule } from './users/users.module';
     DashboardModule,
     LabReportsModule,
     TrialModule,
+    DoctorsModule,
   ],
 })
 export class AppModule {}

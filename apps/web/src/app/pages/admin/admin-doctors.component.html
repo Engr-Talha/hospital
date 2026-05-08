@@ -1,9 +1,8 @@
-<p-card header="Staff users (non-doctors)">
+<p-card header="Doctors">
   <p class="hint">
-    Register administrators, reception, and lab staff here.
-    <strong>Doctors</strong> are registered separately under
-    <a routerLink="/admin/doctors">Admin → Doctors</a> so you can record their
-    medical field. Share temporary passwords securely.
+    Register doctors separately from other staff. Enter their
+    <strong>medical field</strong> (specialty, department, or scope of practice)
+    — this is free text.
   </p>
   <div class="toolbar">
     <p-button
@@ -13,14 +12,14 @@
       routerLink="/admin/dashboard"
     />
     <p-button
-      label="Register doctor"
-      icon="pi pi-heart"
+      label="Staff users (non-doctors)"
+      icon="pi pi-users"
       [outlined]="true"
       severity="secondary"
-      routerLink="/admin/doctors"
+      routerLink="/admin/users"
     />
     <p-button
-      label="Register user"
+      label="Register doctor"
       icon="pi pi-user-plus"
       (onClick)="openRegister()"
     />
@@ -28,53 +27,53 @@
   <p-table
     [value]="rows()"
     [loading]="loading()"
-    [tableStyle]="{ 'min-width': '40rem' }"
+    [tableStyle]="{ 'min-width': '44rem' }"
   >
     <ng-template pTemplate="header">
       <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Role</th>
-        <th>Created</th>
+        <th>Medical field</th>
+        <th>Registered</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-u>
+    <ng-template pTemplate="body" let-row>
       <tr>
-        <td>{{ u.name }}</td>
-        <td>{{ u.email }}</td>
-        <td><p-tag [value]="roleLabel(u.role)" /></td>
-        <td>{{ u.createdAt | date: 'medium' }}</td>
+        <td>{{ row.name }}</td>
+        <td>{{ row.email }}</td>
+        <td>{{ row.medicalField }}</td>
+        <td>{{ row.createdAt | date: 'medium' }}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4">No users loaded.</td>
+        <td colspan="4">No doctors registered yet.</td>
       </tr>
     </ng-template>
   </p-table>
 </p-card>
 
 <p-dialog
-  header="Register staff user (not a doctor)"
+  header="Register doctor"
   [(visible)]="dialogVisible"
   [modal]="true"
-  [style]="{ width: '26rem' }"
+  [style]="{ width: '28rem' }"
   [closable]="!saving"
 >
   <div class="form-stack">
     <div class="field">
-      <label for="reg-name">Full name</label>
+      <label for="doc-name">Full name</label>
       <input
-        id="reg-name"
+        id="doc-name"
         pInputText
         [(ngModel)]="formName"
         autocomplete="name"
       />
     </div>
     <div class="field">
-      <label for="reg-email">Email (login)</label>
+      <label for="doc-email">Email (login)</label>
       <input
-        id="reg-email"
+        id="doc-email"
         pInputText
         type="email"
         [(ngModel)]="formEmail"
@@ -82,20 +81,20 @@
       />
     </div>
     <div class="field">
-      <label for="reg-role">Role</label>
-      <p-select
-        inputId="reg-role"
-        [(ngModel)]="formRole"
-        [options]="roleOptions"
-        optionLabel="label"
-        optionValue="value"
-        [style]="{ width: '100%' }"
-      />
+      <label for="doc-field">Medical field</label>
+      <textarea
+        id="doc-field"
+        pTextarea
+        [(ngModel)]="formMedicalField"
+        rows="3"
+        class="w-full"
+        placeholder="e.g. Cardiology, General medicine, Pediatrics…"
+      ></textarea>
     </div>
     <div class="field">
-      <label for="reg-pw">Temporary password</label>
+      <label for="doc-pw">Temporary password</label>
       <p-password
-        inputId="reg-pw"
+        inputId="doc-pw"
         [(ngModel)]="formPassword"
         [feedback]="true"
         [toggleMask]="true"
@@ -105,9 +104,9 @@
       />
     </div>
     <div class="field">
-      <label for="reg-pw2">Confirm password</label>
+      <label for="doc-pw2">Confirm password</label>
       <p-password
-        inputId="reg-pw2"
+        inputId="doc-pw2"
         [(ngModel)]="formPasswordConfirm"
         [feedback]="false"
         [toggleMask]="true"
@@ -125,7 +124,7 @@
       (onClick)="dialogVisible = false"
     />
     <p-button
-      label="Create user"
+      label="Create doctor"
       icon="pi pi-check"
       [loading]="saving"
       (onClick)="submitRegister()"

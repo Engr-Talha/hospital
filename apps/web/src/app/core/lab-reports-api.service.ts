@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   CreateLabReportRecordDto,
@@ -27,9 +27,16 @@ export class LabReportsApiService {
     return this.http.post<LabReportRecordDetail>('/api/lab/report-records', body);
   }
 
-  listRecords(limit = 50): Observable<LabReportRecordSummary[]> {
+  listRecords(
+    limit = 50,
+    patientMrn?: string,
+  ): Observable<LabReportRecordSummary[]> {
+    let params = new HttpParams().set('limit', String(limit));
+    if (patientMrn?.trim()) {
+      params = params.set('patientMrn', patientMrn.trim());
+    }
     return this.http.get<LabReportRecordSummary[]>('/api/lab/report-records', {
-      params: { limit: String(limit) },
+      params,
     });
   }
 

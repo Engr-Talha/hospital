@@ -112,3 +112,16 @@
 .err {
   margin-bottom: 1rem;
 }
+
+.dash-hint {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color, #64748b);
+  line-height: 1.45;
+}
+
+th.num,
+td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

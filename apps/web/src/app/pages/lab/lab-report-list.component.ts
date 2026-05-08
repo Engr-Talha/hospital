@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LabReportTemplateSummary } from '@hospital/shared';
+import { LabReportTemplateSummary, Role } from '@hospital/shared';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Tag } from 'primeng/tag';
 import { LabReportsApiService } from '../../core/lab-reports-api.service';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-lab-report-list',
@@ -15,6 +16,8 @@ import { LabReportsApiService } from '../../core/lab-reports-api.service';
 })
 export class LabReportListComponent implements OnInit {
   private readonly api = inject(LabReportsApiService);
+  readonly auth = inject(AuthService);
+  readonly Role = Role;
 
   readonly templates = signal<LabReportTemplateSummary[]>([]);
   readonly loading = signal(true);

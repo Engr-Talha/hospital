@@ -78,3 +78,18 @@ export interface LabBenchOverview {
   title: string;
   summary: string;
 }
+
+/** Admin: per–front-desk user totals (patients registered vs fees posted). */
+export interface ReceptionistPerformanceRow {
+  userId: string;
+  name: string;
+  email: string;
+  patientsRegisteredTotal: number;
+  feeLinesPostedTotal: number;
+  feesCollectedTotal: string;
+}
+
+export interface ReceptionistPerformanceOverview {
+  generatedAt: string;
+  receptionists: ReceptionistPerformanceRow[];
+}

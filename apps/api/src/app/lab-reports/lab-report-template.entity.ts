@@ -11,7 +11,7 @@ import {
 export type LabReportFieldSchemaRow = {
   key: string;
   label: string;
-  type: 'text' | 'textarea';
+  type: 'text' | 'textarea' | 'richtext';
 };
 
 @Entity({ name: 'lab_report_templates' })

@@ -1,12 +1,16 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { LabReportFieldSchema, LabReportTemplateSummary } from '@hospital/shared';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
@@ -17,10 +21,23 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { Textarea } from 'primeng/textarea';
 import { LabReportsApiService } from '../../core/lab-reports-api.service';
 
+function richTextRequired(
+  control: AbstractControl,
+): ValidationErrors | null {
+  const v = control.value as string | null | undefined;
+  if (v == null || typeof v !== 'string') return { required: true };
+  const text = v
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .trim();
+  return text.length === 0 ? { required: true } : null;
+}
+
 @Component({
   selector: 'app-lab-report-form',
   imports: [
     ReactiveFormsModule,
+    CKEditorModule,
     Card,
     Button,
     InputText,
@@ -39,6 +56,9 @@ export class LabReportFormComponent implements OnInit {
   private readonly api = inject(LabReportsApiService);
   private readonly messages = inject(MessageService);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ckeditor5-build-classic vs @ckeditor/ckeditor5-angular Editor typings mismatch
+  readonly Editor: any = ClassicEditor;
+
   readonly template = signal<LabReportTemplateSummary | null>(null);
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -54,6 +74,11 @@ export class LabReportFormComponent implements OnInit {
       next: (t) => {
         this.template.set(t);
         this.buildForm(t);
+        const q = this.route.snapshot.queryParamMap;
+        const pmrn = q.get('patientMrn');
+        const pname = q.get('patientName');
+        if (pmrn) this.form.patchValue({ patientMrn: pmrn });
+        if (pname) this.form.patchValue({ patientName: pname });
         this.loading.set(false);
       },
       error: () => {
@@ -75,8 +100,12 @@ export class LabReportFormComponent implements OnInit {
       }),
     };
     for (const f of t.fieldsSchema) {
+      const validators =
+        f.type === 'richtext'
+          ? [richTextRequired]
+          : [Validators.required];
       controls[f.key] = this.fb.control('', {
-        validators: [Validators.required],
+        validators,
         nonNullable: true,
       });
     }

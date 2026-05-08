@@ -6,7 +6,7 @@
 } @else if (template(); as t) {
   <p-card [header]="t.title">
     <p class="hint">
-      Enter patient identifiers manually for now. Linked fee (if any):
+      Paste or type the full report below (formatted text). Linked fee (if any):
       @if (t.feeCatalogItemName) {
         <strong>{{ t.feeCatalogItemName }}</strong>
       } @else {
@@ -27,8 +27,14 @@
       }
 
       @for (f of fields(); track f.key) {
-        <label class="blk" [attr.for]="f.key">{{ f.label }}</label>
-        @if (f.type === 'textarea') {
+        <label class="blk lr-field-label">{{ f.label }}</label>
+        @if (f.type === 'richtext') {
+          <ckeditor
+            [editor]="Editor"
+            [formControlName]="f.key"
+            class="lr-ckeditor"
+          />
+        } @else if (f.type === 'textarea') {
           <textarea
             pTextarea
             [id]="f.key"

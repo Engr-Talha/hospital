@@ -36,6 +36,12 @@
           routerLink="/admin/users"
           severity="secondary"
         />
+        <p-button
+          label="Doctors"
+          icon="pi pi-heart"
+          routerLink="/admin/doctors"
+          severity="secondary"
+        />
       }
     </div>
   </div>
@@ -121,6 +127,49 @@
       </div>
     </p-card>
   </div>
+
+  @if (receptionPerf(); as rp) {
+    <p-card
+      header="Front desk staff — your team’s workload"
+      styleClass="mt-card"
+    >
+      <p class="dash-hint">
+        <strong>Patients</strong> = registered by that user.
+        <strong>Fees collected</strong> = total of charge lines they posted (not
+        necessarily the same patients).
+      </p>
+      <p-table
+        [value]="rp.receptionists"
+        [tableStyle]="{ 'min-width': '100%' }"
+        [paginator]="rp.receptionists.length > 8"
+        [rows]="8"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th class="num">Patients registered</th>
+            <th class="num">Fee lines posted</th>
+            <th class="num">Fees collected</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.email }}</td>
+            <td class="num">{{ row.patientsRegisteredTotal }}</td>
+            <td class="num">{{ row.feeLinesPostedTotal }}</td>
+            <td class="num">{{ row.feesCollectedTotal | number: '1.2-2' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No receptionist accounts yet.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
 
   <div class="chart-row">
     <p-card header="Daily registrations (30 days)">

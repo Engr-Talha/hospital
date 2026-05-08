@@ -1,61 +1,52 @@
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CreateStaffUserRequest, Role, StaffUserSummary } from '@hospital/shared';
-import { HttpErrorResponse } from '@angular/common/http';
+import { CreateDoctorRequest, DoctorSummary } from '@hospital/shared';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Password } from 'primeng/password';
-import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
+import { Textarea } from 'primeng/textarea';
 import { Toast } from 'primeng/toast';
-import { AdminUsersService } from '../../core/admin-users.service';
+import { AdminDoctorsService } from '../../core/admin-doctors.service';
 
 @Component({
-  selector: 'app-admin-users',
+  selector: 'app-admin-doctors',
   imports: [
     FormsModule,
     Card,
     Button,
     TableModule,
-    Tag,
     RouterLink,
     DatePipe,
     Dialog,
     InputText,
     Password,
-    Select,
+    Textarea,
     Toast,
   ],
-  templateUrl: './admin-users.component.html',
-  styleUrl: './admin-users.component.scss',
+  templateUrl: './admin-doctors.component.html',
+  styleUrl: './admin-doctors.component.scss',
 })
-export class AdminUsersComponent implements OnInit {
-  private readonly usersApi = inject(AdminUsersService);
+export class AdminDoctorsComponent implements OnInit {
+  private readonly api = inject(AdminDoctorsService);
   private readonly messages = inject(MessageService);
 
-  readonly rows = signal<StaffUserSummary[]>([]);
+  readonly rows = signal<DoctorSummary[]>([]);
   readonly loading = signal(false);
-
-  /** Doctor accounts are created under Admin → Doctors (includes medical field). */
-  readonly roleOptions: { label: string; value: Role }[] = [
-    { label: 'Administrator', value: Role.ADMIN },
-    { label: 'Reception', value: Role.RECEPTIONIST },
-    { label: 'Lab technician', value: Role.LAB_TECH },
-  ];
 
   dialogVisible = false;
   saving = false;
   formName = '';
   formEmail = '';
+  formMedicalField = '';
   formPassword = '';
   formPasswordConfirm = '';
-  formRole: Role = Role.RECEPTIONIST;
 
   ngOnInit(): void {
     this.reload();
@@ -63,7 +54,7 @@ export class AdminUsersComponent implements OnInit {
 
   reload(): void {
     this.loading.set(true);
-    this.usersApi.list().subscribe({
+    this.api.list().subscribe({
       next: (rows) => {
         this.rows.set(rows);
         this.loading.set(false);
@@ -75,20 +66,30 @@ export class AdminUsersComponent implements OnInit {
   openRegister(): void {
     this.formName = '';
     this.formEmail = '';
+    this.formMedicalField = '';
     this.formPassword = '';
     this.formPasswordConfirm = '';
-    this.formRole = Role.RECEPTIONIST;
     this.dialogVisible = true;
   }
 
   submitRegister(): void {
     const name = this.formName.trim();
     const email = this.formEmail.trim();
+    const medicalField = this.formMedicalField.trim();
     if (!name || !email) {
       this.messages.add({
         severity: 'warn',
         summary: 'Missing fields',
         detail: 'Enter full name and email.',
+      });
+      return;
+    }
+    if (!medicalField) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'Medical field required',
+        detail:
+          'Describe the doctor’s specialty, department, or field of practice.',
       });
       return;
     }
@@ -109,22 +110,22 @@ export class AdminUsersComponent implements OnInit {
       return;
     }
 
-    const body: CreateStaffUserRequest = {
+    const body: CreateDoctorRequest = {
       name,
       email,
       password: this.formPassword,
-      role: this.formRole,
+      medicalField,
     };
 
     this.saving = true;
-    this.usersApi.create(body).subscribe({
+    this.api.create(body).subscribe({
       next: (created) => {
         this.saving = false;
         this.dialogVisible = false;
         this.messages.add({
           severity: 'success',
-          summary: 'User created',
-          detail: `${created.name} can sign in as ${created.email}`,
+          summary: 'Doctor registered',
+          detail: `${created.name} (${created.medicalField}) can sign in as ${created.email}`,
         });
         this.rows.update((r) =>
           [...r, created].sort(
@@ -143,15 +144,10 @@ export class AdminUsersComponent implements OnInit {
               : err.message;
         this.messages.add({
           severity: 'error',
-          summary: 'Could not create user',
+          summary: 'Could not register doctor',
           detail: msg,
         });
       },
     });
-  }
-
-  roleLabel(role: Role): string {
-    if (role === Role.DOCTOR) return 'Doctor';
-    return this.roleOptions.find((o) => o.value === role)?.label ?? role;
   }
 }

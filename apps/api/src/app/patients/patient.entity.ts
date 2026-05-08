@@ -26,8 +26,8 @@ export class PatientEntity {
   @Column({ type: 'varchar', length: 16 })
   gender!: Gender;
 
-  @Column({ type: 'date' })
-  dob!: string;
+  @Column({ type: 'int' })
+  age!: number;
 
   @Column({ type: 'varchar', nullable: true })
   phone!: string | null;
@@ -38,14 +38,18 @@ export class PatientEntity {
   @Column({ name: 'blood_group', type: 'varchar', length: 16, nullable: true })
   bloodGroup!: BloodGroup | null;
 
-  @Column({ name: 'emergency_contact_name', type: 'varchar', nullable: true })
-  emergencyContactName!: string | null;
-
-  @Column({ name: 'emergency_contact_phone', type: 'varchar', nullable: true })
-  emergencyContactPhone!: string | null;
-
   @Column({ type: 'text', nullable: true })
   notes!: string | null;
+
+  @Column({ name: 'appointment_doctor_id', type: 'uuid', nullable: true })
+  appointmentDoctorId!: string | null;
+
+  @ManyToOne(() => UserEntity, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'appointment_doctor_id' })
+  appointmentDoctor!: UserEntity | null;
 
   @Column({ name: 'registered_by_id', type: 'uuid', nullable: true })
   registeredById!: string | null;

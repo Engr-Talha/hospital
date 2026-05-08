@@ -82,15 +82,6 @@ export class FeeSlipPrintComponent implements OnInit {
     return !!this.selectedLine();
   }
 
-  age(dob: string): number {
-    const d = new Date(dob + 'T12:00:00');
-    const t = new Date();
-    let a = t.getFullYear() - d.getFullYear();
-    const m = t.getMonth() - d.getMonth();
-    if (m < 0 || (m === 0 && t.getDate() < d.getDate())) a--;
-    return a;
-  }
-
   patientFullName(p: Patient): string {
     return `${p.firstName} ${p.lastName}`.trim();
   }

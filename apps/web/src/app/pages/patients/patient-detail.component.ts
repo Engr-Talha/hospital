@@ -1,15 +1,19 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   CreatePatientFeeLineDto,
   FeeCatalogItem,
+  LabReportRecordSummary,
+  LabReportTemplateSummary,
   Patient,
   PatientFeeLine,
   Permission,
+  Role,
   UpdatePatientFeeLineDto,
 } from '@hospital/shared';
+import { forkJoin } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -21,8 +25,10 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
+import { ProgressSpinner } from 'primeng/progressspinner';
 import { AuthService } from '../../core/auth.service';
 import { FeeCatalogService } from '../../core/fee-catalog.service';
+import { LabReportsApiService } from '../../core/lab-reports-api.service';
 import { PatientFeesService } from '../../core/patient-fees.service';
 import { PatientsService } from '../../core/patients.service';
 
@@ -42,6 +48,7 @@ import { PatientsService } from '../../core/patients.service';
     InputText,
     InputNumber,
     Select,
+    ProgressSpinner,
   ],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.scss',
@@ -52,13 +59,32 @@ export class PatientDetailComponent implements OnInit {
   private readonly patientsApi = inject(PatientsService);
   private readonly feesApi = inject(PatientFeesService);
   private readonly feeCatalogApi = inject(FeeCatalogService);
+  private readonly labApi = inject(LabReportsApiService);
   readonly auth = inject(AuthService);
   private readonly messages = inject(MessageService);
 
   readonly patient = signal<Patient | null>(null);
   readonly feeLines = signal<PatientFeeLine[]>([]);
   readonly catalogItems = signal<FeeCatalogItem[]>([]);
+  readonly labTemplates = signal<LabReportTemplateSummary[]>([]);
+  readonly labRecords = signal<LabReportRecordSummary[]>([]);
+  readonly labLoading = signal(false);
   readonly Permission = Permission;
+  readonly Role = Role;
+
+  readonly showPatientLabSection = computed(() => {
+    const r = this.auth.user()?.role;
+    return (
+      r === Role.DOCTOR ||
+      r === Role.RECEPTIONIST ||
+      r === Role.ADMIN
+    );
+  });
+
+  readonly canCreateLabReports = computed(() => {
+    const r = this.auth.user()?.role;
+    return r === Role.DOCTOR || r === Role.LAB_TECH || r === Role.ADMIN;
+  });
 
   addDialog = false;
   addMode: 'catalog' | 'custom' = 'catalog';
@@ -79,12 +105,61 @@ export class PatientDetailComponent implements OnInit {
     this.patientsApi.get(id).subscribe({
       next: (p) => {
         this.patient.set(p);
-        if (this.auth.hasPermission(Permission.FEE_LINE_MANAGE)) {
+        const ur = this.auth.user()?.role;
+        if (
+          ur === Role.DOCTOR ||
+          ur === Role.RECEPTIONIST ||
+          ur === Role.ADMIN
+        ) {
+          this.loadLabSection(p);
+        }
+        if (ur !== Role.DOCTOR && this.auth.hasPermission(Permission.PATIENT_VIEW)) {
           this.loadFees(id);
         }
       },
       error: () => void this.router.navigate(['/patients']),
     });
+  }
+
+  patientDisplayName(p: Patient): string {
+    return `${p.firstName} ${p.lastName}`.trim();
+  }
+
+  private loadLabSection(p: Patient): void {
+    this.labLoading.set(true);
+    const ur = this.auth.user()?.role;
+    const needTemplates =
+      ur === Role.DOCTOR || ur === Role.LAB_TECH || ur === Role.ADMIN;
+
+    if (needTemplates) {
+      forkJoin({
+        templates: this.labApi.listTemplates(),
+        records: this.labApi.listRecords(100, p.mrn),
+      }).subscribe({
+        next: ({ templates, records }) => {
+          this.labTemplates.set(templates);
+          this.labRecords.set(records);
+          this.labLoading.set(false);
+        },
+        error: () => {
+          this.labTemplates.set([]);
+          this.labRecords.set([]);
+          this.labLoading.set(false);
+        },
+      });
+    } else {
+      this.labApi.listRecords(100, p.mrn).subscribe({
+        next: (records) => {
+          this.labTemplates.set([]);
+          this.labRecords.set(records);
+          this.labLoading.set(false);
+        },
+        error: () => {
+          this.labRecords.set([]);
+          this.labLoading.set(false);
+        },
+      });
+    }
   }
 
   loadFees(patientId: string): void {

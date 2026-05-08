@@ -1,13 +1,18 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DashboardOverview, Role } from '@hospital/shared';
+import {
+  DashboardOverview,
+  ReceptionistPerformanceOverview,
+  Role,
+} from '@hospital/shared';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { UIChart } from 'primeng/chart';
 import { AuthService } from '../../core/auth.service';
+import { forkJoin } from 'rxjs';
 import { DashboardService } from '../../core/dashboard.service';
 
 @Component({
@@ -33,6 +38,7 @@ export class DashboardComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly overview = signal<DashboardOverview | null>(null);
+  readonly receptionPerf = signal<ReceptionistPerformanceOverview | null>(null);
 
   regChartData: unknown;
   regChartOptions: Record<string, unknown>;
@@ -95,10 +101,14 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadOverview(): void {
-    this.dashboardApi.overview().subscribe({
-      next: (o) => {
-        this.overview.set(o);
-        this.buildCharts(o);
+    forkJoin({
+      overview: this.dashboardApi.overview(),
+      receptionists: this.dashboardApi.receptionistPerformance(),
+    }).subscribe({
+      next: ({ overview, receptionists }) => {
+        this.overview.set(overview);
+        this.receptionPerf.set(receptionists);
+        this.buildCharts(overview);
         this.loading.set(false);
         this.error.set(null);
       },

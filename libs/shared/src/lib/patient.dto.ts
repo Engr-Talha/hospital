@@ -16,16 +16,31 @@ export enum BloodGroup {
   UNKNOWN = 'UNKNOWN',
 }
 
+/** Doctor choices when registering a patient (reception desk). */
+export interface PatientDoctorOption {
+  userId: string;
+  name: string;
+  medicalField: string;
+  label: string;
+}
+
+export interface PatientAppointmentDoctor {
+  userId: string;
+  name: string;
+  medicalField: string;
+}
+
 export interface CreatePatientDto {
   firstName: string;
   lastName: string;
   gender: Gender;
-  dob: string;
+  /** Whole years as entered at registration (not derived from DOB). */
+  age: number;
+  /** Doctor user id for this visit / appointment */
+  appointmentDoctorId: string;
   phone?: string;
   address?: string;
   bloodGroup?: BloodGroup;
-  emergencyContactName?: string;
-  emergencyContactPhone?: string;
   notes?: string;
 }
 
@@ -41,13 +56,12 @@ export interface Patient {
   firstName: string;
   lastName: string;
   gender: Gender;
-  dob: string;
+  age: number;
   phone?: string | null;
   address?: string | null;
   bloodGroup?: BloodGroup | null;
-  emergencyContactName?: string | null;
-  emergencyContactPhone?: string | null;
   notes?: string | null;
+  appointmentDoctor?: PatientAppointmentDoctor | null;
   registeredBy?: PatientRegisteredBySummary | null;
   createdAt: string;
 }

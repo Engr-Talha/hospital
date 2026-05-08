@@ -1,9 +1,13 @@
 import { BloodGroup, Gender } from '@hospital/shared';
+import { Type } from 'class-transformer';
 import {
-  IsDateString,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
+  IsUUID,
+  Max,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -19,8 +23,14 @@ export class CreatePatientBodyDto {
   @IsEnum(Gender)
   gender!: Gender;
 
-  @IsDateString()
-  dob!: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(130)
+  age!: number;
+
+  @IsUUID()
+  appointmentDoctorId!: string;
 
   @IsOptional()
   @IsString()
@@ -33,14 +43,6 @@ export class CreatePatientBodyDto {
   @IsOptional()
   @IsEnum(BloodGroup)
   bloodGroup?: BloodGroup;
-
-  @IsOptional()
-  @IsString()
-  emergencyContactName?: string;
-
-  @IsOptional()
-  @IsString()
-  emergencyContactPhone?: string;
 
   @IsOptional()
   @IsString()

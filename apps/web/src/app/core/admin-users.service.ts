@@ -1,20 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import {
+  CreateStaffUserRequest,
+  StaffUserSummary,
+} from '@hospital/shared';
 import { Observable } from 'rxjs';
-
-export interface AdminUserRow {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  createdAt: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class AdminUsersService {
   constructor(private readonly http: HttpClient) {}
 
-  list(): Observable<AdminUserRow[]> {
-    return this.http.get<AdminUserRow[]>('/api/admin/users');
+  list(): Observable<StaffUserSummary[]> {
+    return this.http.get<StaffUserSummary[]>('/api/admin/users');
+  }
+
+  create(body: CreateStaffUserRequest): Observable<StaffUserSummary> {
+    return this.http.post<StaffUserSummary>('/api/admin/users', body);
   }
 }

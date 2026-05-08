@@ -13,43 +13,75 @@ import { Role } from '@hospital/shared';
 import { Request } from 'express';
 import { RequestUser } from '../auth/jwt.strategy';
 import { Roles } from '../common/decorators/roles.decorator';
+import { PatientsService } from '../patients/patients.service';
 import { CreatePatientFeeLineDto } from './dto/create-patient-fee-line.dto';
 import { UpdatePatientFeeLineDto } from './dto/update-patient-fee-line.dto';
 import { PatientFeesService } from './patient-fees.service';
 
 @Controller('patients/:patientId/fees')
-@Roles(Role.ADMIN, Role.RECEPTIONIST)
 export class PatientFeesController {
-  constructor(private readonly patientFeesService: PatientFeesService) {}
+  constructor(
+    private readonly patientFeesService: PatientFeesService,
+    private readonly patientsService: PatientsService,
+  ) {}
 
+  @Roles(Role.ADMIN, Role.RECEPTIONIST)
   @Get()
-  list(@Param('patientId', new ParseUUIDPipe()) patientId: string) {
+  async list(
+    @Req() req: Request & { user: RequestUser },
+    @Param('patientId', new ParseUUIDPipe()) patientId: string,
+  ) {
+    await this.patientsService.assertCanAccessPatient(
+      patientId,
+      req.user.role,
+      req.user.id,
+    );
     return this.patientFeesService.listForPatient(patientId);
   }
 
+  @Roles(Role.ADMIN, Role.RECEPTIONIST)
   @Post()
-  add(
+  async add(
     @Param('patientId', new ParseUUIDPipe()) patientId: string,
     @Body() dto: CreatePatientFeeLineDto,
     @Req() req: Request & { user: RequestUser },
   ) {
+    await this.patientsService.assertCanAccessPatient(
+      patientId,
+      req.user.role,
+      req.user.id,
+    );
     return this.patientFeesService.addLine(patientId, dto, req.user.id);
   }
 
+  @Roles(Role.ADMIN, Role.RECEPTIONIST)
   @Patch(':lineId')
-  update(
+  async update(
+    @Req() req: Request & { user: RequestUser },
     @Param('patientId', new ParseUUIDPipe()) patientId: string,
     @Param('lineId', new ParseUUIDPipe()) lineId: string,
     @Body() dto: UpdatePatientFeeLineDto,
   ) {
+    await this.patientsService.assertCanAccessPatient(
+      patientId,
+      req.user.role,
+      req.user.id,
+    );
     return this.patientFeesService.updateLine(patientId, lineId, dto);
   }
 
+  @Roles(Role.ADMIN, Role.RECEPTIONIST)
   @Delete(':lineId')
-  remove(
+  async remove(
+    @Req() req: Request & { user: RequestUser },
     @Param('patientId', new ParseUUIDPipe()) patientId: string,
     @Param('lineId', new ParseUUIDPipe()) lineId: string,
   ) {
+    await this.patientsService.assertCanAccessPatient(
+      patientId,
+      req.user.role,
+      req.user.id,
+    );
     return this.patientFeesService.removeLine(patientId, lineId);
   }
 }

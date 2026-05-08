@@ -1,12 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreatePatientDto,
   PaginatedPatients,
   Patient,
+  PatientAppointmentDoctor,
   PatientRegisteredBySummary,
+  Role,
 } from '@hospital/shared';
 import { Repository } from 'typeorm';
+import { DoctorsService } from '../doctors/doctors.service';
 import { PatientEntity } from './patient.entity';
 
 @Injectable()
@@ -14,9 +21,13 @@ export class PatientsService {
   constructor(
     @InjectRepository(PatientEntity)
     private readonly repo: Repository<PatientEntity>,
+    private readonly doctorsService: DoctorsService,
   ) {}
 
-  private toDto(entity: PatientEntity): Patient {
+  private mapEntity(
+    entity: PatientEntity,
+    appointmentDoctor: PatientAppointmentDoctor | null,
+  ): Patient {
     let registeredBy: PatientRegisteredBySummary | null = null;
     if (entity.registeredByUser) {
       const u = entity.registeredByUser;
@@ -26,23 +37,18 @@ export class PatientsService {
         email: u.email,
       };
     }
-    const dob =
-      typeof entity.dob === 'string'
-        ? entity.dob
-        : (entity.dob as Date).toISOString().slice(0, 10);
     return {
       id: entity.id,
       mrn: entity.mrn,
       firstName: entity.firstName,
       lastName: entity.lastName,
       gender: entity.gender,
-      dob,
+      age: entity.age,
       phone: entity.phone,
       address: entity.address,
       bloodGroup: entity.bloodGroup,
-      emergencyContactName: entity.emergencyContactName,
-      emergencyContactPhone: entity.emergencyContactPhone,
       notes: entity.notes,
+      appointmentDoctor,
       registeredBy,
       createdAt: entity.createdAt.toISOString(),
     };
@@ -69,19 +75,19 @@ export class PatientsService {
     dto: CreatePatientDto,
     registeredById: string,
   ): Promise<Patient> {
+    await this.doctorsService.assertValidDoctorUserId(dto.appointmentDoctorId);
     const mrn = await this.nextMrn();
     const row = this.repo.create({
       mrn,
       firstName: dto.firstName.trim(),
       lastName: dto.lastName.trim(),
       gender: dto.gender,
-      dob: dto.dob.slice(0, 10),
+      age: dto.age,
       phone: dto.phone?.trim() || null,
       address: dto.address?.trim() || null,
       bloodGroup: dto.bloodGroup ?? null,
-      emergencyContactName: dto.emergencyContactName?.trim() || null,
-      emergencyContactPhone: dto.emergencyContactPhone?.trim() || null,
       notes: dto.notes?.trim() || null,
+      appointmentDoctorId: dto.appointmentDoctorId,
       registeredById,
     });
     const saved = await this.repo.save(row);
@@ -92,14 +98,19 @@ export class PatientsService {
     search?: string;
     page: number;
     limit: number;
+    /** When set (front desk), only patients registered by this user. */
+    registeredByUserId?: string;
   }): Promise<PaginatedPatients> {
-    const { search, page, limit } = params;
+    const { search, page, limit, registeredByUserId } = params;
     const qb = this.repo
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.registeredByUser', 'u')
       .orderBy('p.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
+    if (registeredByUserId) {
+      qb.andWhere('p.registered_by_id = :rid', { rid: registeredByUserId });
+    }
     if (search?.trim()) {
       const term = `%${search.trim().toLowerCase()}%`;
       qb.andWhere(
@@ -109,7 +120,7 @@ export class PatientsService {
     }
     const [items, total] = await qb.getManyAndCount();
     return {
-      items: items.map((i) => this.toDto(i)),
+      items: items.map((i) => this.mapEntity(i, null)),
       total,
       page,
       limit,
@@ -122,7 +133,13 @@ export class PatientsService {
       relations: { registeredByUser: true },
     });
     if (!entity) throw new NotFoundException('Patient not found');
-    return this.toDto(entity);
+    let appointmentDoctor: PatientAppointmentDoctor | null = null;
+    if (entity.appointmentDoctorId) {
+      appointmentDoctor = await this.doctorsService.getAppointmentSummary(
+        entity.appointmentDoctorId,
+      );
+    }
+    return this.mapEntity(entity, appointmentDoctor);
   }
 
   async update(
@@ -135,18 +152,23 @@ export class PatientsService {
       entity.firstName = patch.firstName.trim();
     if (patch.lastName !== undefined) entity.lastName = patch.lastName.trim();
     if (patch.gender !== undefined) entity.gender = patch.gender;
-    if (patch.dob !== undefined) entity.dob = patch.dob.slice(0, 10);
+    if (patch.age !== undefined) entity.age = patch.age;
     if (patch.phone !== undefined)
       entity.phone = patch.phone?.trim() || null;
     if (patch.address !== undefined)
       entity.address = patch.address?.trim() || null;
     if (patch.bloodGroup !== undefined) entity.bloodGroup = patch.bloodGroup;
-    if (patch.emergencyContactName !== undefined)
-      entity.emergencyContactName = patch.emergencyContactName?.trim() || null;
-    if (patch.emergencyContactPhone !== undefined)
-      entity.emergencyContactPhone =
-        patch.emergencyContactPhone?.trim() || null;
     if (patch.notes !== undefined) entity.notes = patch.notes?.trim() || null;
+    if (patch.appointmentDoctorId !== undefined) {
+      if (patch.appointmentDoctorId) {
+        await this.doctorsService.assertValidDoctorUserId(
+          patch.appointmentDoctorId,
+        );
+        entity.appointmentDoctorId = patch.appointmentDoctorId;
+      } else {
+        entity.appointmentDoctorId = null;
+      }
+    }
     await this.repo.save(entity);
     return this.findOne(id);
   }
@@ -154,5 +176,24 @@ export class PatientsService {
   async remove(id: string): Promise<void> {
     const res = await this.repo.delete({ id });
     if (!res.affected) throw new NotFoundException('Patient not found');
+  }
+
+  /** Receptionists may only open patients they registered; others see all (within role rules). */
+  async assertCanAccessPatient(
+    patientId: string,
+    viewerRole: Role,
+    viewerUserId: string,
+  ): Promise<void> {
+    if (viewerRole !== Role.RECEPTIONIST) return;
+    const row = await this.repo.findOne({
+      where: { id: patientId },
+      select: ['id', 'registeredById'],
+    });
+    if (!row) throw new NotFoundException('Patient not found');
+    if (row.registeredById !== viewerUserId) {
+      throw new ForbiddenException(
+        'You can only view patients you registered.',
+      );
+    }
   }
 }

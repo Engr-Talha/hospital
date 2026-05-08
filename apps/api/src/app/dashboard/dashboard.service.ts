@@ -4,10 +4,13 @@ import {
   DashboardOverview,
   LabBenchOverview,
   ReceptionDeskOverview,
+  ReceptionistPerformanceOverview,
+  Role,
 } from '@hospital/shared';
 import { Repository } from 'typeorm';
 import { PatientFeeLineEntity } from '../patient-fees/patient-fee-line.entity';
 import { PatientEntity } from '../patients/patient.entity';
+import { UserEntity } from '../users/user.entity';
 
 @Injectable()
 export class DashboardService {
@@ -16,6 +19,8 @@ export class DashboardService {
     private readonly patientsRepo: Repository<PatientEntity>,
     @InjectRepository(PatientFeeLineEntity)
     private readonly feeLinesRepo: Repository<PatientFeeLineEntity>,
+    @InjectRepository(UserEntity)
+    private readonly usersRepo: Repository<UserEntity>,
   ) {}
 
   private money(n: number): string {
@@ -194,7 +199,8 @@ export class DashboardService {
     };
   }
 
-  async getReceptionDesk(): Promise<ReceptionDeskOverview> {
+  /** Metrics scoped to one receptionist (patients they registered, fees they posted). */
+  async getReceptionDesk(userId: string): Promise<ReceptionDeskOverview> {
     const now = new Date();
     const startToday = new Date(now);
     startToday.setHours(0, 0, 0, 0);
@@ -203,44 +209,55 @@ export class DashboardService {
     start7.setHours(0, 0, 0, 0);
     const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const totalPatients = await this.patientsRepo.count();
+    const totalPatients = await this.patientsRepo.count({
+      where: { registeredById: userId },
+    });
     const todayPatients = await this.patientsRepo
       .createQueryBuilder('p')
-      .where('p.created_at >= :d', { d: startToday })
+      .where('p.registered_by_id = :uid', { uid: userId })
+      .andWhere('p.created_at >= :d', { d: startToday })
       .getCount();
     const weekPatients = await this.patientsRepo
       .createQueryBuilder('p')
-      .where('p.created_at >= :d', { d: start7 })
+      .where('p.registered_by_id = :uid', { uid: userId })
+      .andWhere('p.created_at >= :d', { d: start7 })
       .getCount();
     const monthPatients = await this.patientsRepo
       .createQueryBuilder('p')
-      .where('p.created_at >= :d', { d: startMonth })
+      .where('p.registered_by_id = :uid', { uid: userId })
+      .andWhere('p.created_at >= :d', { d: startMonth })
       .getCount();
 
     const sumTodayRaw = await this.feeLinesRepo
       .createQueryBuilder('f')
       .select('COALESCE(SUM(f.line_total::numeric),0)', 's')
-      .where('f.created_at >= :d', { d: startToday })
+      .where('f.created_by_id = :uid', { uid: userId })
+      .andWhere('f.created_at >= :d', { d: startToday })
       .getRawOne<{ s: string }>();
     const feesToday = this.money(this.parseNum(sumTodayRaw?.s));
 
     const sumWeekRaw = await this.feeLinesRepo
       .createQueryBuilder('f')
       .select('COALESCE(SUM(f.line_total::numeric),0)', 's')
-      .where('f.created_at >= :d', { d: start7 })
+      .where('f.created_by_id = :uid', { uid: userId })
+      .andWhere('f.created_at >= :d', { d: start7 })
       .getRawOne<{ s: string }>();
     const feesWeek = this.money(this.parseNum(sumWeekRaw?.s));
 
     const sumMonthRaw = await this.feeLinesRepo
       .createQueryBuilder('f')
       .select('COALESCE(SUM(f.line_total::numeric),0)', 's')
-      .where('f.created_at >= :d', { d: startMonth })
+      .where('f.created_by_id = :uid', { uid: userId })
+      .andWhere('f.created_at >= :d', { d: startMonth })
       .getRawOne<{ s: string }>();
     const feesMonth = this.money(this.parseNum(sumMonthRaw?.s));
 
-    const totalChargeLines = await this.feeLinesRepo.count();
+    const totalChargeLines = await this.feeLinesRepo.count({
+      where: { createdById: userId },
+    });
 
     const recent = await this.patientsRepo.find({
+      where: { registeredById: userId },
       order: { createdAt: 'DESC' },
       take: 10,
       select: ['id', 'mrn', 'firstName', 'lastName', 'createdAt'],
@@ -267,6 +284,58 @@ export class DashboardService {
         lastName: p.lastName,
         createdAt: p.createdAt.toISOString(),
       })),
+    };
+  }
+
+  async getReceptionistPerformance(): Promise<ReceptionistPerformanceOverview> {
+    const receptionists = await this.usersRepo.find({
+      where: { role: Role.RECEPTIONIST },
+      order: { name: 'ASC' },
+    });
+
+    const patientRows = await this.patientsRepo
+      .createQueryBuilder('p')
+      .select('p.registered_by_id', 'uid')
+      .addSelect('COUNT(*)', 'cnt')
+      .where('p.registered_by_id IS NOT NULL')
+      .groupBy('p.registered_by_id')
+      .getRawMany<{ uid: string; cnt: string }>();
+
+    const feeRows = await this.feeLinesRepo
+      .createQueryBuilder('f')
+      .select('f.created_by_id', 'uid')
+      .addSelect('COUNT(*)', 'lines')
+      .addSelect('COALESCE(SUM(f.line_total::numeric),0)', 'total')
+      .where('f.created_by_id IS NOT NULL')
+      .groupBy('f.created_by_id')
+      .getRawMany<{ uid: string; lines: string; total: string }>();
+
+    const byPatients = new Map(
+      patientRows.map((r) => [r.uid, parseInt(r.cnt, 10)]),
+    );
+    const byFees = new Map(
+      feeRows.map((r) => [
+        r.uid,
+        {
+          lines: parseInt(r.lines, 10),
+          total: this.money(this.parseNum(r.total)),
+        },
+      ]),
+    );
+
+    return {
+      generatedAt: new Date().toISOString(),
+      receptionists: receptionists.map((u) => {
+        const f = byFees.get(u.id);
+        return {
+          userId: u.id,
+          name: u.name,
+          email: u.email,
+          patientsRegisteredTotal: byPatients.get(u.id) ?? 0,
+          feeLinesPostedTotal: f?.lines ?? 0,
+          feesCollectedTotal: f?.total ?? '0.00',
+        };
+      }),
     };
   }
 

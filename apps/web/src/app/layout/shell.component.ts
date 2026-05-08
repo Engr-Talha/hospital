@@ -27,23 +27,36 @@ export class ShellComponent implements OnInit {
 
   readonly menuModel = computed((): MenuItem[] => {
     const u = this.auth.user();
-    const items: MenuItem[] = [
-      {
-        label:
-          u?.role === Role.ADMIN
-            ? 'Admin overview'
-            : u?.role === Role.RECEPTIONIST
-              ? 'Front desk'
-              : 'Lab',
-        icon: 'pi pi-home',
-        routerLink: [this.auth.homePath()],
-      },
-      {
-        label: 'Patients',
-        icon: 'pi pi-users',
-        routerLink: ['/patients'],
-      },
-    ];
+    const items: MenuItem[] = [];
+
+    if (u?.role === Role.DOCTOR) {
+      items.push(
+        { label: 'Lab', icon: 'pi pi-flask', routerLink: ['/lab'] },
+        {
+          label: 'Patients',
+          icon: 'pi pi-users',
+          routerLink: ['/patients'],
+        },
+      );
+    } else {
+      items.push(
+        {
+          label:
+            u?.role === Role.ADMIN
+              ? 'Admin overview'
+              : u?.role === Role.RECEPTIONIST
+                ? 'Front desk'
+                : 'Lab',
+          icon: 'pi pi-home',
+          routerLink: [this.auth.homePath()],
+        },
+        {
+          label: 'Patients',
+          icon: 'pi pi-users',
+          routerLink: ['/patients'],
+        },
+      );
+    }
     if (this.auth.hasPermission(Permission.PATIENT_REGISTER)) {
       items.push({
         label: 'Register patient',
@@ -51,7 +64,11 @@ export class ShellComponent implements OnInit {
         routerLink: ['/patients/new'],
       });
     }
-    if (u?.role === Role.LAB_TECH || u?.role === Role.ADMIN) {
+    if (
+      u?.role === Role.LAB_TECH ||
+      u?.role === Role.ADMIN ||
+      u?.role === Role.DOCTOR
+    ) {
       items.push({
         label: 'Lab reports',
         icon: 'pi pi-file-edit',
@@ -69,6 +86,11 @@ export class ShellComponent implements OnInit {
             routerLink: ['/admin/users'],
           },
           {
+            label: 'Doctors',
+            icon: 'pi pi-heart',
+            routerLink: ['/admin/doctors'],
+          },
+          {
             label: 'Fee catalog',
             icon: 'pi pi-list',
             routerLink: ['/admin/fee-catalog'],
@@ -82,7 +104,10 @@ export class ShellComponent implements OnInit {
       });
     }
     items.push({
-      label: u?.name ?? 'Account',
+      label:
+        u?.role === Role.DOCTOR
+          ? `Doctor · ${u.name}`
+          : (u?.name ?? 'Account'),
       icon: 'pi pi-user',
       items: [
         {

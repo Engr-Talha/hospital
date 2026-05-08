@@ -97,9 +97,7 @@
         <div class="lc-field-row lc-age-gender">
           <div class="lc-field-inline">
             <span class="lc-label">Age</span>
-            <span class="lc-line lc-line-fill lc-line-short">{{
-              age(p.dob)
-            }}</span>
+            <span class="lc-line lc-line-fill lc-line-short">{{ p.age }}</span>
           </div>
           <div class="lc-gender-block">
             <span class="lc-label">Gender</span>
@@ -119,7 +117,7 @@
         </div>
       } @else {
         <div class="fee-pos-meta">
-          Age {{ age(p.dob) }} · {{ p.gender }}
+          Age {{ p.age }} · {{ p.gender }}
         </div>
       }
     </section>

@@ -11,7 +11,7 @@ import {
   LabReportTemplateSummary,
   UpdateLabReportTemplateDto,
 } from '@hospital/shared';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
 import { FeeCatalogService } from '../fee-catalog/fee-catalog.service';
 import {
@@ -44,19 +44,12 @@ const REPORT_TEMPLATE_TITLES: readonly string[] = [
   'ABD-CRL',
 ] as const;
 
+/** Single rich-text body (CKEditor HTML); replaces legacy multi-field templates. */
 const DEFAULT_FIELDS: LabReportFieldSchemaRow[] = [
   {
-    key: 'clinicalHistory',
-    label: 'Clinical history / indication',
-    type: 'textarea',
-  },
-  { key: 'technique', label: 'Technique / protocol', type: 'textarea' },
-  { key: 'findings', label: 'Findings / measurements', type: 'textarea' },
-  { key: 'impression', label: 'Impression', type: 'textarea' },
-  {
-    key: 'recommendation',
-    label: 'Recommendation / advice',
-    type: 'textarea',
+    key: 'reportBody',
+    label: 'Report',
+    type: 'richtext',
   },
 ];
 
@@ -77,6 +70,24 @@ export class LabReportsService {
     private readonly recordsRepo: Repository<LabReportRecordEntity>,
     private readonly feeCatalogService: FeeCatalogService,
   ) {}
+
+  /** One-time schema migration: all templates use a single HTML body field. */
+  async migrateTemplatesToRichEditor(): Promise<void> {
+    const target: LabReportFieldSchemaRow[] = [
+      { key: 'reportBody', label: 'Report', type: 'richtext' },
+    ];
+    const rows = await this.templatesRepo.find();
+    for (const row of rows) {
+      const s = row.fieldsSchema;
+      const already =
+        s.length === 1 &&
+        s[0]?.key === 'reportBody' &&
+        s[0]?.type === 'richtext';
+      if (already) continue;
+      row.fieldsSchema = target;
+      await this.templatesRepo.save(row);
+    }
+  }
 
   async ensureSeedTemplates(): Promise<void> {
     let order = 0;
@@ -214,13 +225,21 @@ export class LabReportsService {
     return this.getRecordDetail(saved.id);
   }
 
-  async listRecords(limit = 50): Promise<LabReportRecordSummary[]> {
+  async listRecords(
+    limit = 50,
+    patientMrn?: string,
+  ): Promise<LabReportRecordSummary[]> {
     const safe = Math.min(Math.max(limit, 1), 200);
-    const rows = await this.recordsRepo.find({
+    const mrn = patientMrn?.trim();
+    const opts: FindManyOptions<LabReportRecordEntity> = {
       relations: ['template', 'createdBy'],
       order: { createdAt: 'DESC' },
       take: safe,
-    });
+    };
+    if (mrn) {
+      opts.where = { patientMrn: mrn };
+    }
+    const rows = await this.recordsRepo.find(opts);
     return rows.map((r) => ({
       id: r.id,
       templateId: r.template.id,

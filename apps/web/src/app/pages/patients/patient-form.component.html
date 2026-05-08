@@ -1,5 +1,13 @@
 <p-toast />
 <p-card header="Register patient">
+  @if (doctorOptions().length === 0) {
+    <p-message
+      severity="warn"
+      text="No doctors are registered yet. Add doctors under Admin → Doctors, then refresh this page."
+      [closable]="false"
+      styleClass="mb-3"
+    />
+  }
   <form [formGroup]="form" (ngSubmit)="submit()" class="grid">
     <div class="col">
       <label for="fn">First name *</label>
@@ -18,8 +26,31 @@
       </select>
     </div>
     <div class="col">
-      <label for="dob">Date of birth *</label>
-      <input pInputText id="dob" type="date" formControlName="dob" class="w-full" />
+      <label for="age">Age (years) *</label>
+      <input
+        pInputText
+        id="age"
+        type="number"
+        formControlName="age"
+        class="w-full"
+        min="0"
+        max="130"
+        inputmode="numeric"
+        placeholder="e.g. 35"
+      />
+    </div>
+    <div class="col full">
+      <label for="doc">Appointment doctor *</label>
+      <p-select
+        inputId="doc"
+        formControlName="appointmentDoctorId"
+        [options]="doctorOptions()"
+        optionLabel="label"
+        optionValue="userId"
+        placeholder="Select doctor"
+        [style]="{ width: '100%' }"
+        styleClass="w-full"
+      />
     </div>
     <div class="col">
       <label for="phone">Phone</label>
@@ -38,24 +69,6 @@
       <label for="addr">Address</label>
       <input pInputText id="addr" formControlName="address" class="w-full" />
     </div>
-    <div class="col">
-      <label for="ecn">Emergency contact name</label>
-      <input
-        pInputText
-        id="ecn"
-        formControlName="emergencyContactName"
-        class="w-full"
-      />
-    </div>
-    <div class="col">
-      <label for="ecp">Emergency contact phone</label>
-      <input
-        pInputText
-        id="ecp"
-        formControlName="emergencyContactPhone"
-        class="w-full"
-      />
-    </div>
     <div class="col full">
       <label for="notes">Notes</label>
       <textarea
@@ -72,6 +85,7 @@
         label="Save patient"
         icon="pi pi-check"
         [loading]="saving"
+        [disabled]="doctorOptions().length === 0"
       />
       <p-button
         type="button"

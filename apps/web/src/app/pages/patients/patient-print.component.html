@@ -66,9 +66,7 @@
       <div class="lc-field-row lc-age-gender">
         <div class="lc-field-inline">
           <span class="lc-label">Age</span>
-          <span class="lc-line lc-line-fill lc-line-short">{{
-            age(p.dob)
-          }}</span>
+          <span class="lc-line lc-line-fill lc-line-short">{{ p.age }}</span>
         </div>
         <div class="lc-gender-block">
           <span class="lc-label">Gender</span>
@@ -109,13 +107,11 @@
           @if (p.address) {
             <div class="lc-note-line">{{ p.address }}</div>
           }
-          @if (p.emergencyContactName || p.emergencyContactPhone) {
+          @if (p.appointmentDoctor) {
             <div class="lc-note-line">
-              Emergency:
-              {{ p.emergencyContactName || '—'
-              }}{{
-                p.emergencyContactPhone ? ' — ' + p.emergencyContactPhone : ''
-              }}
+              Doctor: {{ p.appointmentDoctor.name }} ({{
+                p.appointmentDoctor.medicalField
+              }})
             </div>
           }
           @if (p.bloodGroup) {
@@ -145,7 +141,7 @@
         <div class="lc-rx-space">
           @if (p.registeredBy) {
             <p class="lc-reg-meta">
-              Registered by: {{ p.registeredBy.name }} · DOB: {{ p.dob }}
+              Registered by: {{ p.registeredBy.name }} · Age: {{ p.age }} yrs
             </p>
           }
         </div>

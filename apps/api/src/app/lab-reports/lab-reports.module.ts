@@ -20,5 +20,6 @@ export class LabReportsModule implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.labReports.ensureSeedTemplates();
+    await this.labReports.migrateTemplatesToRichEditor();
   }
 }

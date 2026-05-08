@@ -11,8 +11,10 @@
 } @else if (desk(); as d) {
   <div class="desk-head">
     <div>
-      <h1 class="desk-title">Front desk</h1>
-      <p class="desk-sub">Snapshot as of {{ d.generatedAt | date: 'medium' }}</p>
+      <h1 class="desk-title">Your desk</h1>
+      <p class="desk-sub">
+        Your registrations &amp; charges only · {{ d.generatedAt | date: 'medium' }}
+      </p>
     </div>
     <div class="desk-actions">
       <p-button label="Patients" icon="pi pi-users" routerLink="/patients" />
@@ -25,36 +27,36 @@
   </div>
 
   <div class="stat-grid">
-    <p-card header="Patients (total)">
+    <p-card header="Your patients (total)">
       <p class="stat-val">{{ d.patients.total }}</p>
     </p-card>
-    <p-card header="New today">
+    <p-card header="You registered today">
       <p class="stat-val">{{ d.patients.today }}</p>
     </p-card>
-    <p-card header="New (7 days)">
+    <p-card header="You registered (7 days)">
       <p class="stat-val">{{ d.patients.last7Days }}</p>
     </p-card>
-    <p-card header="New (this month)">
+    <p-card header="You registered (this month)">
       <p class="stat-val">{{ d.patients.thisMonth }}</p>
     </p-card>
   </div>
 
   <div class="stat-grid mt-card">
-    <p-card header="Charges today">
+    <p-card header="You posted charges today">
       <p class="stat-val">{{ d.fees.today }}</p>
     </p-card>
-    <p-card header="Charges (7 days)">
+    <p-card header="You posted (7 days)">
       <p class="stat-val">{{ d.fees.last7Days }}</p>
     </p-card>
-    <p-card header="Charges (this month)">
+    <p-card header="You posted (this month)">
       <p class="stat-val">{{ d.fees.thisMonth }}</p>
     </p-card>
-    <p-card header="Charge lines (all time)">
+    <p-card header="Your fee lines (all time)">
       <p class="stat-val">{{ d.fees.totalChargeLines }}</p>
     </p-card>
   </div>
 
-  <p-card header="Recent registrations" class="mt-card">
+  <p-card header="Your recent registrations" class="mt-card">
     <p-table [value]="d.recentPatients" [tableStyle]="{ 'min-width': '40rem' }">
       <ng-template pTemplate="header">
         <tr>

@@ -12,6 +12,7 @@ export enum Permission {
   DASHBOARD_ADMIN = 'DASHBOARD_ADMIN',
   DASHBOARD_RECEPTION = 'DASHBOARD_RECEPTION',
   DASHBOARD_LAB = 'DASHBOARD_LAB',
+  DASHBOARD_DOCTOR = 'DASHBOARD_DOCTOR',
   USER_ADMIN = 'USER_ADMIN',
 }
 
@@ -35,6 +36,12 @@ export function permissionsForRole(role: Role): Permission[] {
         Permission.PATIENT_VIEW,
         Permission.FEE_CATALOG_VIEW,
         Permission.DASHBOARD_LAB,
+      ];
+    case Role.DOCTOR:
+      return [
+        Permission.PATIENT_VIEW,
+        Permission.DASHBOARD_LAB,
+        Permission.DASHBOARD_DOCTOR,
       ];
     default:
       return [];

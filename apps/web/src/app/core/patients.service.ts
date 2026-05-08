@@ -4,6 +4,7 @@ import {
   CreatePatientDto,
   PaginatedPatients,
   Patient,
+  PatientDoctorOption,
 } from '@hospital/shared';
 import { Observable } from 'rxjs';
 
@@ -27,6 +28,11 @@ export class PatientsService {
 
   get(id: string): Observable<Patient> {
     return this.http.get<Patient>(`/api/patients/${id}`);
+  }
+
+  /** Doctors shown on patient registration (reception). */
+  doctorOptions(): Observable<PatientDoctorOption[]> {
+    return this.http.get<PatientDoctorOption[]>('/api/patients/doctor-options');
   }
 
   create(body: CreatePatientDto): Observable<Patient> {
