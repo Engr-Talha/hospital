@@ -1,0 +1,82 @@
+<p-toast />
+<p-card header="Lab report templates">
+  <p class="hint">
+    Link each report type to a <strong>fee catalog</strong> line so reception and
+    billing know which charge applies. Technicians use
+    <strong>Lab → Lab reports</strong> to fill and print.
+  </p>
+  <p-button
+    label="Back to dashboard"
+    icon="pi pi-arrow-left"
+    [text]="true"
+    routerLink="/admin/dashboard"
+    class="mb-2"
+  />
+  <p-table
+    [value]="rows()"
+    [loading]="loading()"
+    [tableStyle]="{ 'min-width': '48rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Title</th>
+        <th>Slug</th>
+        <th>Linked fee</th>
+        <th>Active</th>
+        <th style="width: 10rem">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-t>
+      <tr>
+        <td>{{ t.title }}</td>
+        <td><code class="slug">{{ t.slug }}</code></td>
+        <td>
+          @if (t.feeCatalogItemName) {
+            <p-tag [value]="t.feeCatalogItemName" severity="success" />
+          } @else {
+            <span class="muted">—</span>
+          }
+        </td>
+        <td>
+          <p-toggleswitch
+            [ngModel]="t.isActive"
+            (ngModelChange)="toggleActive(t, $event)"
+          />
+        </td>
+        <td>
+          <p-button
+            label="Link fee"
+            icon="pi pi-link"
+            [text]="true"
+            (onClick)="openLink(t)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-dialog
+  header="Link fee catalog item"
+  [(visible)]="linkDialog"
+  [modal]="true"
+  [style]="{ width: '26rem' }"
+  (onHide)="editing = null"
+>
+  @if (editing; as e) {
+    <p class="dlg-title">{{ e.title }}</p>
+    <label class="blk">Fee catalog item</label>
+    <p-select
+      [options]="catalogOptions()"
+      [(ngModel)]="selCatalogId"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select"
+      styleClass="w-full"
+    />
+  }
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" severity="secondary" (onClick)="linkDialog = false" />
+    <p-button label="Save" icon="pi pi-check" (onClick)="saveLink()" />
+  </ng-template>
+</p-dialog>

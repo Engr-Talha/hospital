@@ -1,0 +1,58 @@
+<p-toast />
+@if (loading()) {
+  <div class="form-loading">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+} @else if (template(); as t) {
+  <p-card [header]="t.title">
+    <p class="hint">
+      Enter patient identifiers manually for now. Linked fee (if any):
+      @if (t.feeCatalogItemName) {
+        <strong>{{ t.feeCatalogItemName }}</strong>
+      } @else {
+        <em>none</em>
+      }
+    </p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="lr-form">
+      <label class="blk" for="mrn">MRN / Ref#</label>
+      <input pInputText id="mrn" formControlName="patientMrn" class="w-full" />
+      @if (form.get('patientMrn')?.invalid && form.get('patientMrn')?.touched) {
+        <small class="err">Required</small>
+      }
+
+      <label class="blk" for="pn">Patient name</label>
+      <input pInputText id="pn" formControlName="patientName" class="w-full" />
+      @if (form.get('patientName')?.invalid && form.get('patientName')?.touched) {
+        <small class="err">Required</small>
+      }
+
+      <label class="blk" for="reportText">Report text</label>
+      <textarea
+        pTextarea
+        id="reportText"
+        formControlName="reportText"
+        rows="16"
+        class="w-full report-box"
+        placeholder="Paste complete lab report here..."
+      ></textarea>
+      @if (form.get('reportText')?.invalid && form.get('reportText')?.touched) {
+        <small class="err">Required</small>
+      }
+
+      <div class="actions">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          type="button"
+          routerLink="/lab/reports"
+        />
+        <p-button
+          label="Save & print"
+          icon="pi pi-print"
+          type="submit"
+          [loading]="saving()"
+        />
+      </div>
+    </form>
+  </p-card>
+}

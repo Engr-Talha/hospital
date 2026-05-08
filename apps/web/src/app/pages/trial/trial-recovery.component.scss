@@ -1,0 +1,47 @@
+.tr-wrap {
+  max-width: 32rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  line-height: 1.45;
+  margin: 0 0 1rem;
+}
+
+.hint code {
+  font-size: 0.85em;
+}
+
+.status-line {
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+.tr-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.blk {
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.blk:first-of-type {
+  margin-top: 0;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.tr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

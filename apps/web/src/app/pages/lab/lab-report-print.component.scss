@@ -1,0 +1,56 @@
+@use '../patients/life-care-slip-shared' as *;
+
+.lab-doc-title {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 10px 0 6px;
+  padding: 6px 8px;
+  border: 2px solid #000;
+}
+
+.lab-doc-meta {
+  margin-top: 4px;
+}
+
+.lab-tech-line {
+  margin-top: 6px;
+}
+
+.lab-field-block {
+  margin-bottom: 10px;
+  break-inside: avoid;
+}
+
+.lab-field-body {
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 340px;
+  padding: 2px 0;
+}
+
+.lab-sig-block {
+  margin-top: 16mm;
+  max-width: 55%;
+}
+
+.lab-sig-line {
+  border-bottom: 1px solid #000;
+  min-height: 1.2em;
+  margin-bottom: 4px;
+}
+
+.lab-sig-label {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

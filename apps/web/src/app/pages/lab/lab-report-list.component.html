@@ -1,0 +1,52 @@
+<div class="lr-head">
+  <div>
+    <h1 class="lr-title">Lab / radiology reports</h1>
+    <p class="lr-sub">
+      Choose a report type, enter patient MRN and name, fill the fields, then
+      print. Templates match your sample Word files under
+      <code>report-template/</code>; billing can be linked under Admin → Lab
+      report templates.
+    </p>
+  </div>
+  <p-button
+    label="Recent reports"
+    icon="pi pi-history"
+    severity="secondary"
+    [outlined]="true"
+    routerLink="/lab/reports/recent"
+  />
+</div>
+
+@if (loading()) {
+  <div class="lr-loading">
+    <p-progressSpinner strokeWidth="4" />
+  </div>
+} @else if (error(); as err) {
+  <p-card [header]="'Error'">
+    <p>{{ err }}</p>
+  </p-card>
+} @else {
+  <div class="lr-grid">
+    @for (t of templates(); track t.id) {
+      <p-card [header]="t.title">
+        <p class="lr-meta">
+          @if (t.feeCatalogItemName) {
+            <p-tag
+              [value]="'Fee: ' + t.feeCatalogItemName"
+              severity="success"
+              icon="pi pi-link"
+            />
+          } @else {
+            <span class="lr-unlinked">No fee catalog link (admin can link)</span>
+          }
+        </p>
+        <p-button
+          label="Fill report"
+          icon="pi pi-pencil"
+          [routerLink]="['/lab/reports/new', t.id]"
+          styleClass="w-full mt-2"
+        />
+      </p-card>
+    }
+  </div>
+}
