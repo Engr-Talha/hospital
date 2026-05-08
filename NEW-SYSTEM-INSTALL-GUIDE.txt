@@ -1,0 +1,162 @@
+HOSPITAL SOFTWARE NEW SYSTEM GUIDE (EASY ROMAN URDU)
+=====================================================
+
+Is file ko follow karo, software new system par same tarah chal jayega.
+
+
+1) PEHLE KYA INSTALL KARNA HAI
+------------------------------
+
+1. Node.js (LTS 20.x best hai)
+   Link: https://nodejs.org/
+
+2. Docker Desktop
+   Link: https://www.docker.com/products/docker-desktop/
+
+3. Git (optional)
+   Sirf tab chahiye jab aap repo clone karna chahein.
+   Link: https://git-scm.com/download/win
+
+
+2) PROJECT NEW SYSTEM PAR LAANA
+-------------------------------
+
+Best tareeqa:
+- Pura "Hospital" folder copy karo.
+
+Recommended path:
+- C:\Users\<UserName>\Desktop\Hospital
+
+Important:
+- Agar ".env" file pehle se bani hui hai to usko bhi copy karo.
+- Agar ".env" nahi hai to baad me ".env.example" se bana lenge.
+
+
+3) FIRST TIME SETUP (SIRF EK DAFA)
+----------------------------------
+
+Step 1:
+- Docker Desktop open karo.
+- Confirm karo Docker "Running" ho.
+
+Step 2:
+- Hospital folder open karo.
+- Us folder me CMD/PowerShell kholo.
+
+Step 3:
+- Command chalao:
+  npm install
+
+Step 4:
+- Agar ".env" nahi hai to command chalao:
+  copy .env.example .env
+
+Step 5:
+- Database start karo:
+  docker compose up -d
+
+Step 6:
+- Software start karo:
+  npm start
+
+Step 7:
+- Browser me open karo:
+  http://localhost:4200
+
+
+4) ROZANA SOFTWARE CHALANE KA SIMPLE TAREEQA
+--------------------------------------------
+
+Roz sirf yeh karo:
+1. Docker Desktop start karo
+2. Desktop se "Start-Hospital.bat" double click karo
+3. Browser me kholo: http://localhost:4200
+
+Note:
+- Jo black command window open hoti hai, usay band mat karo.
+- Agar band kar di to software ruk jayega.
+
+
+5) SOFTWARE BAND KARNA
+----------------------
+
+Band karne ka tareeqa:
+1. "Stop-Hospital.bat" double click karo
+2. "Start-Hospital.bat" wali black window close karo
+
+
+6) LOGIN DETAILS
+----------------
+
+Admin:
+  Email: admin@hospital.local
+  Password: admin123
+
+Reception:
+  Email: reception@hospital.local
+  Password: recept123
+
+Lab:
+  Email: lab@hospital.local
+  Password: lab12345
+
+Important:
+- Real use me passwords change zaroor karna.
+
+
+7) DESKTOP ICON / SHORTCUT
+--------------------------
+
+Option A:
+- Start-Hospital.bat ka shortcut desktop par rakho
+- Stop-Hospital.bat ka shortcut bhi rakho
+
+Option B:
+- Browser me localhost khol ke "Create shortcut" / "Install app" karo
+
+
+8) AGAR SOFTWARE START NA HO
+----------------------------
+
+Problem 1: docker compose error
+Fix:
+- Docker Desktop running honi chahiye
+- Docker restart karo, phir dobara try karo
+
+Problem 2: npm start error
+Fix:
+- Hospital folder me:
+  npm install
+- Phir:
+  npm start
+
+Problem 3: login/API issue
+Fix:
+- Database up karo:
+  docker compose up -d
+- App dobara start karo:
+  npm start
+
+Problem 4: port issue (4200 / 3000 / 5432)
+Fix:
+- Purane running apps/processes بند karo
+- ya ports change karo (advanced)
+
+
+9) QUICK COMMANDS
+-----------------
+
+First time:
+  npm install
+  copy .env.example .env
+  docker compose up -d
+  npm start
+
+Stop db:
+  docker compose stop
+
+Stop containers:
+  docker compose down
+
+
+DONE
