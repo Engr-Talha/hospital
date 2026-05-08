@@ -62,7 +62,7 @@ Edit `[.env](.env)` if needed. Defaults match `[docker-compose.yml](docker-compo
 | `DB_NAME` | `hospital`          |
 
 
-For first-time local development, keep `TYPEORM_SYNC=true` so TypeORM creates tables when the API starts. Set a real `JWT_SECRET` before any shared or production deployment.
+Use `TYPEORM_SYNC=false` and run migrations (`npm run migrate:run`) instead of schema auto-sync. Set a real `JWT_SECRET` before any shared or production deployment.
 
 ### 5. Start PostgreSQL with Docker Compose
 
@@ -96,7 +96,7 @@ Create a **new PostgreSQL connection**:
 - **Username:** `postgres`
 - **Password:** `postgres` (must match `POSTGRES_PASSWORD` in `docker-compose.yml` and `DB_PASS` in `.env`)
 
-Test connection → you should see schemas and, after the API has run once with `TYPEORM_SYNC=true`, tables such as `users`, `patients`, etc.
+Test connection → you should see schemas and, after migrations have run once, tables such as `users`, `patients`, etc.
 
 ### 7. Run the API and the web app
 
@@ -152,7 +152,7 @@ Change passwords before any real deployment.
 ## Configuration (quick reference)
 
 1. Copy `[.env.example](.env.example)` to `.env` at the repo root (or edit the generated `.env`).
-2. Ensure `DB_`* and `JWT_SECRET` are set. `TYPEORM_SYNC=true` auto-creates tables in development.
+2. Ensure `DB_`* and `JWT_SECRET` are set. Keep `TYPEORM_SYNC=false` and use migrations.
 
 ## Default logins (seeded on API startup)
 
@@ -288,7 +288,7 @@ Anyone with server disk access could still open the compiled `.js` files (minifi
 ### Suggested on-site architecture
 
 1. **One PC or small server** on the hospital LAN (Windows or Linux) with **Node.js LTS** and **PostgreSQL** (or PostgreSQL in Docker on that same machine only).
-2. On **your** office machine: clone the repo, set production `.env` (`JWT_SECRET`, strong DB password, `**TYPEORM_SYNC=false`** after first migration — do not rely on auto-sync in production), run `npm run build`.
+2. On **your** office machine: clone the repo, set production `.env` (`JWT_SECRET`, strong DB password, `TYPEORM_SYNC=false`), run `npm run migrate:run`, then run `npm run build`.
 3. Copy to the hospital machine **only**:
   - `dist/apps/web/browser/` (entire folder),
   - `dist/apps/api/` (main.js, assets, generated `package.json`),
@@ -305,4 +305,4 @@ Anyone with server disk access could still open the compiled `.js` files (minifi
 - **Do** use OS **user accounts** and **firewall** rules so only IT/admin can log into the server; reception users only get the website.
 - **HTTPS on LAN** is optional but recommended if you issue a local CA or use a split-DNS cert; at minimum restrict the admin/API port to localhost (proxy only).
 
-If you need **schema migrations** without `TYPEORM_SYNC`, add a proper migration workflow later; until then, first deploy can use sync once to create tables, then turn sync off and redeploy.
+Schema changes should be delivered via SQL migration files in `scripts/migrations/` and applied with `npm run migrate:run` (or automatically through `scripts/windows/start-hospital.bat`).
