@@ -91,13 +91,43 @@ if errorlevel 1 (
 echo       Waiting for database container...
 timeout /t 8 /nobreak >nul
 
+REM ---------- Patients schema compatibility patch ----------
+echo [3/5] Applying patients age-column compatibility patch...
+set "PATIENTS_TABLE_EXISTS="
+for /f %%i in ('docker compose exec -T postgres psql -U postgres -d hospital -tAc "SELECT to_regclass(''public.patients'') IS NOT NULL;"') do set "PATIENTS_TABLE_EXISTS=%%i"
+if /i "%PATIENTS_TABLE_EXISTS%"=="t" (
+  docker compose exec -T postgres psql -U postgres -d hospital -v ON_ERROR_STOP=1 -c "ALTER TABLE patients ADD COLUMN IF NOT EXISTS age integer;"
+  if errorlevel 1 goto :patch_fail
+  docker compose exec -T postgres psql -U postgres -d hospital -v ON_ERROR_STOP=1 -c "UPDATE patients SET age = EXTRACT(YEAR FROM age(current_date, dob))::int WHERE age IS NULL AND dob IS NOT NULL;"
+  if errorlevel 1 goto :patch_fail
+  docker compose exec -T postgres psql -U postgres -d hospital -v ON_ERROR_STOP=1 -c "UPDATE patients SET age = 0 WHERE age IS NULL;"
+  if errorlevel 1 goto :patch_fail
+  docker compose exec -T postgres psql -U postgres -d hospital -v ON_ERROR_STOP=1 -c "ALTER TABLE patients ALTER COLUMN age SET NOT NULL;"
+  if errorlevel 1 goto :patch_fail
+  docker compose exec -T postgres psql -U postgres -d hospital -v ON_ERROR_STOP=1 -c "ALTER TABLE patients DROP COLUMN IF EXISTS dob;"
+  if errorlevel 1 goto :patch_fail
+  echo       Database compatibility patch applied.
+) else (
+  echo       Patients table not present yet; skipping compatibility patch.
+)
+goto :patch_done
+
+:patch_fail
+echo [ERROR] Failed to apply patients schema compatibility patch.
+echo         Check database state manually, then run this script again.
+pause
+popd
+exit /b 1
+
+:patch_done
+
 REM ---------- npm start in new window ----------
-echo [3/4] Starting API + Web ^(npm start^) in a separate window...
+echo [4/5] Starting API + Web ^(npm start^) in a separate window...
 REM Use PowerShell so paths with spaces work reliably.
 start "Hospital HIS - npm start" powershell -NoExit -NoProfile -Command "Set-Location -LiteralPath '%REPO_ROOT%'; Write-Host ('Repository: ' + (Get-Location).Path); npm start"
 
 REM ---------- Wait then open browser ----------
-echo [4/4] Waiting for http://localhost:3000 and :4200 ...
+echo [5/5] Waiting for http://localhost:3000 and :4200 ...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0wait-dev-servers.ps1"
 if errorlevel 1 (
   echo [WARN] Servers did not respond in time. Opening browser anyway -- refresh if the page is empty.
