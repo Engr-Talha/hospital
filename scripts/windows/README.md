@@ -4,8 +4,9 @@
 
 1. Checks **Docker**; if the engine is down, starts **Docker Desktop** (common install paths) and waits until `docker info` works.
 2. Runs **`docker compose up -d`** from the repository root (PostgreSQL).
-3. Opens a **new Command Prompt** window and runs **`npm start`** (API + Angular in parallel).
-4. Waits until **http://localhost:3000** (API) and **http://localhost:4200** (web) respond, then opens the app in your **default browser**.
+3. Shows migration status (**applied/pending**) and applies all pending SQL migrations from `scripts/migrations/`.
+4. Opens a **new Command Prompt** window and runs **`npm start`** (API + Angular in parallel).
+5. Waits until API/web respond, then opens the app in your browser using the machine LAN IP URL (for same-network access).
 
 ## Requirements
 

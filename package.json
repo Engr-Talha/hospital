@@ -7,6 +7,8 @@
     "start:api": "npx nx serve api",
     "start:web": "npx nx serve web",
     "start:web:lan": "npx nx serve web --host=0.0.0.0",
+    "migrate:status": "node scripts/run-migrations.mjs --status",
+    "migrate:run": "node scripts/run-migrations.mjs --apply",
     "build": "npx nx run-many -t build -p api,web"
   },
   "private": true,

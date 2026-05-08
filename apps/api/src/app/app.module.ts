@@ -42,7 +42,7 @@ import { UsersModule } from './users/users.module';
           TrialSettingsEntity,
           DoctorEntity,
         ],
-        synchronize: config.get<string>('TYPEORM_SYNC', 'true') === 'true',
+        synchronize: config.get<string>('TYPEORM_SYNC', 'false') === 'true',
       }),
     }),
     UsersModule,
