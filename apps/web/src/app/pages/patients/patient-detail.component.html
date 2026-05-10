@@ -2,6 +2,15 @@
 @if (patient(); as p) {
   <p-card [header]="p.firstName + ' ' + p.lastName" [subheader]="p.mrn">
     <div class="toolbar">
+      @if (auth.hasPermission(Permission.PATIENT_EDIT_ALL)) {
+        <p-button
+          label="Edit patient details"
+          icon="pi pi-user-edit"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="openEditPatient()"
+        />
+      }
       @if (auth.hasPermission(Permission.PATIENT_REGISTRATION_PRINT)) {
         <p-button
           label="Registration slip"
@@ -254,6 +263,112 @@
   </p-card>
   }
 }
+
+<p-dialog
+  header="Edit patient details"
+  [(visible)]="patientEditDialog"
+  [modal]="true"
+  [style]="{ width: 'min(36rem, 100vw)' }"
+  [closable]="!savingPatientEdit"
+>
+  @if (doctorOptionsForEdit().length === 0) {
+    <p-message
+      severity="warn"
+      text="No doctors are registered yet. Add doctors under Admin → Doctors, then open this dialog again."
+      [closable]="false"
+      styleClass="mb-3"
+    />
+  }
+  <form [formGroup]="editPatientForm" (ngSubmit)="savePatientEdit()" class="pe-grid">
+    <div class="pe-col">
+      <label for="pe-fn">First name *</label>
+      <input pInputText id="pe-fn" formControlName="firstName" class="w-full" />
+    </div>
+    <div class="pe-col">
+      <label for="pe-ln">Last name *</label>
+      <input pInputText id="pe-ln" formControlName="lastName" class="w-full" />
+    </div>
+    <div class="pe-col">
+      <label for="pe-gender">Gender *</label>
+      <select id="pe-gender" formControlName="gender" class="w-full pe-native">
+        @for (g of genders; track g) {
+          <option [value]="g">{{ g }}</option>
+        }
+      </select>
+    </div>
+    <div class="pe-col">
+      <label for="pe-age">Age (years) *</label>
+      <input
+        pInputText
+        id="pe-age"
+        type="number"
+        formControlName="age"
+        class="w-full"
+        min="0"
+        max="130"
+        inputmode="numeric"
+      />
+    </div>
+    <div class="pe-col pe-full">
+      <label for="pe-doc">Appointment doctor *</label>
+      <p-select
+        inputId="pe-doc"
+        formControlName="appointmentDoctorId"
+        [options]="doctorOptionsForEdit()"
+        optionLabel="label"
+        optionValue="userId"
+        placeholder="Select doctor"
+        [style]="{ width: '100%' }"
+        styleClass="w-full"
+      />
+    </div>
+    <div class="pe-col">
+      <label for="pe-phone">Phone</label>
+      <input pInputText id="pe-phone" formControlName="phone" class="w-full" />
+    </div>
+    <div class="pe-col">
+      <label for="pe-blood">Blood group</label>
+      <select id="pe-blood" formControlName="bloodGroup" class="w-full pe-native">
+        <option value="">(not specified)</option>
+        @for (b of bloodGroups; track b) {
+          <option [value]="b">{{ b }}</option>
+        }
+      </select>
+    </div>
+    <div class="pe-col pe-full">
+      <label for="pe-addr">Address</label>
+      <input pInputText id="pe-addr" formControlName="address" class="w-full" />
+    </div>
+    <div class="pe-col pe-full">
+      <label for="pe-notes">Notes</label>
+      <textarea
+        pTextarea
+        id="pe-notes"
+        formControlName="notes"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </div>
+  </form>
+  <p class="pe-mrn-hint">
+    MRN <strong>{{ patient()?.mrn }}</strong> and who registered the patient cannot be changed here.
+  </p>
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      [text]="true"
+      [disabled]="savingPatientEdit"
+      (onClick)="patientEditDialog = false"
+    />
+    <p-button
+      label="Save details"
+      icon="pi pi-check"
+      [loading]="savingPatientEdit"
+      [disabled]="doctorOptionsForEdit().length === 0"
+      (onClick)="savePatientEdit()"
+    />
+  </ng-template>
+</p-dialog>
 
 <p-dialog
   header="Add charge"

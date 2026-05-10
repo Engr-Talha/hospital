@@ -35,6 +35,7 @@
         <th>Email</th>
         <th>Medical field</th>
         <th>Registered</th>
+        <th class="col-actions"></th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-row>
@@ -43,11 +44,23 @@
         <td>{{ row.email }}</td>
         <td>{{ row.medicalField }}</td>
         <td>{{ row.createdAt | date: 'medium' }}</td>
+        <td class="col-actions">
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            [loading]="deletingId === row.id"
+            [disabled]="deletingId !== null && deletingId !== row.id"
+            (onClick)="confirmDelete(row)"
+            [attr.aria-label]="'Remove ' + row.name"
+          />
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4">No doctors registered yet.</td>
+        <td colspan="5">No doctors registered yet.</td>
       </tr>
     </ng-template>
   </p-table>

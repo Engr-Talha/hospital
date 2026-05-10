@@ -27,6 +27,7 @@ export function permissionsForRole(role: Role): Permission[] {
         Permission.PATIENT_VIEW,
         Permission.PATIENT_REGISTER,
         Permission.PATIENT_REGISTRATION_PRINT,
+        Permission.PATIENT_EDIT_ALL,
         Permission.FEE_LINE_MANAGE,
         Permission.FEE_CATALOG_VIEW,
         Permission.DASHBOARD_RECEPTION,

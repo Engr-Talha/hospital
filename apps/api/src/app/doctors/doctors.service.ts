@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -137,5 +138,41 @@ export class DoctorsService {
     if (!ok) {
       throw new BadRequestException('Selected doctor is invalid');
     }
+  }
+
+  /**
+   * Deletes the doctor profile and login user (by doctor row id).
+   * Lab reports that list this user as author are reassigned to `reassignAuthorToUserId`
+   * (typically the admin performing the delete).
+   */
+  async removeByProfileId(
+    doctorProfileId: string,
+    reassignAuthorToUserId: string,
+  ): Promise<void> {
+    const doctor = await this.doctorsRepo.findOne({
+      where: { id: doctorProfileId },
+    });
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+    if (doctor.userId === reassignAuthorToUserId) {
+      throw new BadRequestException(
+        'Cannot reassign lab report authorship to the user being removed.',
+      );
+    }
+    const actingUser = await this.usersRepo.findOne({
+      where: { id: reassignAuthorToUserId },
+    });
+    if (!actingUser) {
+      throw new BadRequestException('Invalid acting user for reassignment');
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      await manager.query(
+        `UPDATE lab_report_records SET created_by_id = $1 WHERE created_by_id = $2`,
+        [reassignAuthorToUserId, doctor.userId],
+      );
+      await manager.getRepository(UserEntity).delete(doctor.userId);
+    });
   }
 }

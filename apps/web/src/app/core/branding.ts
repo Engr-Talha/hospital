@@ -9,7 +9,10 @@ export const APP_BRANDING = {
   companyName: 'Malgray',
   companyWebsite: 'https://malgray.com',
   companyWebsiteDisplay: 'malgray.com',
-  /** Pakistan mobile; tel: uses E.164 without spaces. */
+  /** Clinic contact on printed slips (Life Care header/footer). */
+  clinicPhoneDisplay: '0334-9062009',
+  clinicPhoneTel: '+923349062009',
+  /** Vendor / HIS support (shell, login). */
   supportPhoneDisplay: '0310-5071527',
   supportPhoneTel: '+923105071527',
   designedByLine: 'Software designed by Malgray Labs',

@@ -4,6 +4,12 @@ const { join } = require('path');
 const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
+  resolve: {
+    alias: {
+      // Webpack does not read tsconfig paths; keep in sync with tsconfig.base.json
+      '@hospital/shared': join(__dirname, '../../libs/shared/src/index.ts'),
+    },
+  },
   output: {
     path: join(__dirname, '../../dist/apps/api'),
     clean: true,

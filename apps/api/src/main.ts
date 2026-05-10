@@ -14,10 +14,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const port = Number(process.env.PORT) || 3000;
+  /** `0.0.0.0` = accept connections from other PCs on the LAN (this machine as server). */
+  const host = process.env.HOST ?? '0.0.0.0';
+  await app.listen(port, host);
   Logger.log(
-    `Application is running on: http://localhost:${port}/${globalPrefix}`,
+    `API listening on http://${host}:${port}/${globalPrefix} (other devices: use this PC's LAN IP instead of localhost)`,
   );
 }
 

@@ -1,5 +1,17 @@
 @use '../patients/life-care-slip-shared' as *;
 
+/* Registration/fee slips use min-height: 297mm; that forces a tall box for html2pdf’s
+   slicer and worsens blank gaps. Lab reports should grow with content only. */
+.print-area.life-care-slip.lab-doc {
+  min-height: auto;
+}
+
+/* Word/CKEditor paste can set page-break-before: always; html2pdf’s css mode may respect it */
+.lab-rich-print ::ng-deep * {
+  page-break-before: auto !important;
+  break-before: auto !important;
+}
+
 .lab-doc-meta {
   margin-top: 4px;
 }

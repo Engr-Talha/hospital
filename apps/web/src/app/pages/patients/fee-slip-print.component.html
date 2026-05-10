@@ -36,7 +36,7 @@
         </div>
         <div class="lc-black-bar">
           Opposite Pin School Main Makhad Road Jand, District Attock
-          &nbsp;·&nbsp; 0345-0000000
+          &nbsp;·&nbsp; {{ branding.clinicPhoneDisplay }}
         </div>
         <div class="lc-pills">
           <span class="lc-pill" dir="rtl">لیباریٹری</span>
@@ -64,7 +64,9 @@
         <div class="fee-pos-tag">
           {{ isSingleChargeSlip() ? 'SINGLE CHARGE RECEIPT' : 'CHARGES RECEIPT' }}
         </div>
-        <div class="fee-pos-addr">Jand, Attock · 0345-0000000</div>
+        <div class="fee-pos-addr">
+          Jand, Attock · {{ branding.clinicPhoneDisplay }}
+        </div>
       </header>
     }
 
@@ -161,14 +163,14 @@
     @if (layoutMode() === 'a4') {
       <p class="lc-fee-disclaimer">Not valid for court.</p>
       <p class="lc-fee-footer-ur" dir="rtl">
-        مکھد روڈ جند، ضلع اٹک — 0345-0000000
+        مکھد روڈ جند، ضلع اٹک — {{ branding.clinicPhoneDisplay }}
       </p>
     } @else {
       <p class="fee-pos-disclaimer">Not valid for court.</p>
     }
     <p class="lc-system-footer" [class.fee-pos-vendor]="layoutMode() === 'pos'">
       {{ branding.productShortName }} · {{ branding.companyWebsiteDisplay }} ·
-      {{ branding.supportPhoneDisplay }}
+      {{ branding.clinicPhoneDisplay }}
     </p>
   </div>
 }

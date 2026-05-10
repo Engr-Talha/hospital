@@ -39,6 +39,7 @@ export class AdminDoctorsComponent implements OnInit {
 
   readonly rows = signal<DoctorSummary[]>([]);
   readonly loading = signal(false);
+  deletingId: string | null = null;
 
   dialogVisible = false;
   saving = false;
@@ -145,6 +146,40 @@ export class AdminDoctorsComponent implements OnInit {
         this.messages.add({
           severity: 'error',
           summary: 'Could not register doctor',
+          detail: msg,
+        });
+      },
+    });
+  }
+
+  confirmDelete(row: DoctorSummary): void {
+    const ok = window.confirm(
+      `Remove doctor "${row.name}" (${row.email})? They will no longer be able to sign in. Any lab reports they created will list your account as the author instead.`,
+    );
+    if (!ok) return;
+
+    this.deletingId = row.id;
+    this.api.remove(row.id).subscribe({
+      next: () => {
+        this.deletingId = null;
+        this.rows.update((r) => r.filter((x) => x.id !== row.id));
+        this.messages.add({
+          severity: 'success',
+          summary: 'Doctor removed',
+          detail: `${row.name} has been deleted. Lab reports they authored now list you as the author.`,
+        });
+      },
+      error: (err: HttpErrorResponse) => {
+        this.deletingId = null;
+        const msg =
+          typeof err.error?.message === 'string'
+            ? err.error.message
+            : Array.isArray(err.error?.message)
+              ? err.error.message.join(', ')
+              : err.message;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Could not remove doctor',
           detail: msg,
         });
       },

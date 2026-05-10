@@ -1,16 +1,26 @@
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
+  BloodGroup,
   CreatePatientFeeLineDto,
   FeeCatalogItem,
+  Gender,
   LabReportRecordSummary,
   LabReportTemplateSummary,
   Patient,
+  PatientDoctorOption,
   PatientFeeLine,
   Permission,
   Role,
+  UpdatePatientDto,
   UpdatePatientFeeLineDto,
 } from '@hospital/shared';
 import { forkJoin } from 'rxjs';
@@ -21,7 +31,9 @@ import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
+import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
+import { Textarea } from 'primeng/textarea';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
@@ -37,6 +49,7 @@ import { PatientsService } from '../../core/patients.service';
   imports: [
     DatePipe,
     FormsModule,
+    ReactiveFormsModule,
     Card,
     Button,
     RouterLink,
@@ -48,6 +61,8 @@ import { PatientsService } from '../../core/patients.service';
     InputText,
     InputNumber,
     Select,
+    Textarea,
+    Message,
     ProgressSpinner,
   ],
   templateUrl: './patient-detail.component.html',
@@ -56,6 +71,7 @@ import { PatientsService } from '../../core/patients.service';
 export class PatientDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
   private readonly patientsApi = inject(PatientsService);
   private readonly feesApi = inject(PatientFeesService);
   private readonly feeCatalogApi = inject(FeeCatalogService);
@@ -71,6 +87,27 @@ export class PatientDetailComponent implements OnInit {
   readonly labLoading = signal(false);
   readonly Permission = Permission;
   readonly Role = Role;
+  readonly genders = Object.values(Gender);
+  readonly bloodGroups = Object.values(BloodGroup);
+  readonly doctorOptionsForEdit = signal<PatientDoctorOption[]>([]);
+
+  patientEditDialog = false;
+  savingPatientEdit = false;
+
+  readonly editPatientForm = this.fb.group({
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
+    gender: [Gender.MALE, Validators.required],
+    age: [
+      null as number | null,
+      [Validators.required, Validators.min(0), Validators.max(130)],
+    ],
+    appointmentDoctorId: ['', Validators.required],
+    phone: [''],
+    address: [''],
+    bloodGroup: [''],
+    notes: [''],
+  });
 
   readonly showPatientLabSection = computed(() => {
     const r = this.auth.user()?.role;
@@ -123,6 +160,119 @@ export class PatientDetailComponent implements OnInit {
 
   patientDisplayName(p: Patient): string {
     return `${p.firstName} ${p.lastName}`.trim();
+  }
+
+  openEditPatient(): void {
+    const p = this.patient();
+    if (!p) return;
+    this.patientsApi.doctorOptions().subscribe({
+      next: (opts) => {
+        this.doctorOptionsForEdit.set(opts);
+        this.editPatientForm.patchValue({
+          firstName: p.firstName,
+          lastName: p.lastName,
+          gender: p.gender,
+          age: p.age,
+          appointmentDoctorId: p.appointmentDoctor?.userId ?? '',
+          phone: p.phone ?? '',
+          address: p.address ?? '',
+          bloodGroup: p.bloodGroup ?? '',
+          notes: p.notes ?? '',
+        });
+        this.patientEditDialog = true;
+      },
+      error: () =>
+        this.messages.add({
+          severity: 'error',
+          summary: 'Could not load doctors',
+          detail: 'Try again or ask an admin to check doctor accounts.',
+        }),
+    });
+  }
+
+  savePatientEdit(): void {
+    const p = this.patient();
+    if (!p) return;
+    this.editPatientForm.markAllAsTouched();
+    if (this.editPatientForm.invalid) return;
+    if (this.doctorOptionsForEdit().length === 0) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'No doctors available',
+        detail: 'Register doctors under Admin → Doctors first.',
+      });
+      return;
+    }
+    const raw = this.editPatientForm.getRawValue();
+    const ageNum = Math.round(Number(raw.age));
+    if (!Number.isFinite(ageNum) || ageNum < 0 || ageNum > 130) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'Invalid age',
+        detail: 'Enter age as a whole number from 0 to 130.',
+      });
+      return;
+    }
+    const docId = raw.appointmentDoctorId?.trim();
+    if (!docId) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'Appointment doctor required',
+        detail: 'Select the appointment doctor.',
+      });
+      return;
+    }
+    const bloodRaw = raw.bloodGroup?.trim();
+    const blood =
+      bloodRaw && bloodRaw.length > 0
+        ? (bloodRaw as BloodGroup)
+        : undefined;
+    const body: UpdatePatientDto = {
+      firstName: raw.firstName!.trim(),
+      lastName: raw.lastName!.trim(),
+      gender: raw.gender!,
+      age: ageNum,
+      appointmentDoctorId: docId,
+      phone: raw.phone?.trim() || undefined,
+      address: raw.address?.trim() || undefined,
+      bloodGroup: blood,
+      notes: raw.notes?.trim() || undefined,
+    };
+    this.savingPatientEdit = true;
+    this.patientsApi.update(p.id, body).subscribe({
+      next: (updated) => {
+        this.savingPatientEdit = false;
+        this.patient.set(updated);
+        this.patientEditDialog = false;
+        this.messages.add({
+          severity: 'success',
+          summary: 'Patient updated',
+          detail: 'Details saved. MRN and registration record are unchanged.',
+        });
+        const ur = this.auth.user()?.role;
+        if (
+          ur === Role.DOCTOR ||
+          ur === Role.RECEPTIONIST ||
+          ur === Role.ADMIN
+        ) {
+          this.loadLabSection(updated);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.savingPatientEdit = false;
+        const msg =
+          typeof err.error?.message === 'string'
+            ? err.error.message
+            : Array.isArray(err.error?.message)
+              ? err.error.message.join(', ')
+              : err.message;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Could not save',
+          detail: msg,
+        });
+      },
+    });
   }
 
   private loadLabSection(p: Patient): void {

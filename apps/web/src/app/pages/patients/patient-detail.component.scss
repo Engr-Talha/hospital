@@ -119,8 +119,35 @@
   gap: 0.75rem;
 }
 
-.pd-lab-tpl-title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  line-height: 1.3;
+.pe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.pe-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pe-col.pe-full {
+  grid-column: 1 / -1;
+}
+
+.pe-native {
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--p-content-border-color, #dee2e6);
+  background: var(--p-content-background, #fff);
+}
+
+.pe-mrn-hint {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--p-text-muted-color, #6c757d);
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
 }

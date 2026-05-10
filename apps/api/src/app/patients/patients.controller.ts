@@ -77,12 +77,18 @@ export class PatientsController {
     return this.patientsService.findOne(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.RECEPTIONIST)
   @Patch(':id')
-  update(
+  async update(
+    @Req() req: Request & { user: RequestUser },
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdatePatientBodyDto,
   ) {
+    await this.patientsService.assertCanAccessPatient(
+      id,
+      req.user.role,
+      req.user.id,
+    );
     return this.patientsService.update(id, body);
   }
 

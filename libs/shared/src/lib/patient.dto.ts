@@ -44,6 +44,9 @@ export interface CreatePatientDto {
   notes?: string;
 }
 
+/** Demographics and appointment doctor only; MRN and registration metadata are not editable. */
+export type UpdatePatientDto = Partial<CreatePatientDto>;
+
 export interface PatientRegisteredBySummary {
   id: string;
   name: string;

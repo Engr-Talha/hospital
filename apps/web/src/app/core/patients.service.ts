@@ -5,6 +5,7 @@ import {
   PaginatedPatients,
   Patient,
   PatientDoctorOption,
+  UpdatePatientDto,
 } from '@hospital/shared';
 import { Observable } from 'rxjs';
 
@@ -37,6 +38,10 @@ export class PatientsService {
 
   create(body: CreatePatientDto): Observable<Patient> {
     return this.http.post<Patient>('/api/patients', body);
+  }
+
+  update(id: string, body: UpdatePatientDto): Observable<Patient> {
+    return this.http.patch<Patient>(`/api/patients/${id}`, body);
   }
 
   delete(id: string): Observable<void> {

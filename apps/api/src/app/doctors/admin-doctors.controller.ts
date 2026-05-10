@@ -1,5 +1,16 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+} from '@nestjs/common';
+import type { Request } from 'express';
 import { Role } from '@hospital/shared';
+import { RequestUser } from '../auth/jwt.strategy';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreateDoctorBodyDto } from './dto/create-doctor.dto';
 import { DoctorsService } from './doctors.service';
@@ -17,5 +28,13 @@ export class AdminDoctorsController {
   @Post()
   create(@Body() body: CreateDoctorBodyDto) {
     return this.doctorsService.create(body);
+  }
+
+  @Delete(':id')
+  remove(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Req() req: Request & { user: RequestUser },
+  ) {
+    return this.doctorsService.removeByProfileId(id, req.user.id);
   }
 }

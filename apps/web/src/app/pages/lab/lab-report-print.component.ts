@@ -107,7 +107,9 @@ export class LabReportPrintComponent implements OnInit, OnDestroy {
       image: { type: 'jpeg' as const, quality: 0.92 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      // avoid-all is known to leave huge blank bands / header-only “pages” when splitting
+      // (github.com/eKoopmans/html2pdf.js issues #512, #551, #907). CSS + legacy is enough.
+      pagebreak: { mode: ['css', 'legacy'] },
     };
     return html2pdf().set(opt).from(el).outputPdf('blob');
   }

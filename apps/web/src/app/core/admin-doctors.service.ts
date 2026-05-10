@@ -14,4 +14,8 @@ export class AdminDoctorsService {
   create(body: CreateDoctorRequest): Observable<DoctorSummary> {
     return this.http.post<DoctorSummary>('/api/admin/doctors', body);
   }
+
+  remove(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/admin/doctors/${id}`);
+  }
 }
