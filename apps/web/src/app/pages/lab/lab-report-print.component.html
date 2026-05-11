@@ -25,75 +25,40 @@
 
 @if (record(); as r) {
   <div #printRoot class="print-area life-care-slip lab-doc">
-    <header class="lc-top">
-      <div class="lc-brand-row">
-        <div class="lc-en-title">THE LIFE CARE MEDICAL CENTER</div>
-        <div class="lc-logo-wrap">
-          <img
-            class="lc-logo-img"
-            src="/assets/life-care-logo.jpeg"
-            alt="THE LIFE CARE"
-          />
-        </div>
-        <div class="lc-ur-title" dir="rtl">دی لائف کیئر میڈیکل سینٹر</div>
-      </div>
-      <div class="lc-black-bar">
-        Opposite Pin School Main Makhad Road Jand, District Attock &nbsp;·&nbsp;
-        {{ branding.clinicPhoneDisplay }}
-      </div>
-      <div class="lc-pills">
-        <span class="lc-pill" dir="rtl">لیباریٹری</span>
-        <span class="lc-pill" dir="rtl">الٹراساؤنڈ</span>
-        <span class="lc-pill" dir="rtl">ایکس رے</span>
-      </div>
-    </header>
-
-    <section class="lc-patient-block lab-doc-meta">
-      <div class="lc-ref-date">
-        <div class="lc-field-inline">
-          <span class="lc-label">Ref# / MRN</span>
-          <span class="lc-line lc-line-fill">{{ r.patientMrn }}</span>
-        </div>
-        <div class="lc-field-inline lc-field-right">
-          <span class="lc-label">Date</span>
-          <span class="lc-line lc-line-fill">{{
-            printedAt() | date: 'dd/MM/yyyy'
-          }}</span>
-        </div>
-      </div>
-      <div class="lc-field-row">
-        <span class="lc-label">Patient's Name</span>
-        <span class="lc-line lc-line-fill lc-line-long">{{ r.patientName }}</span>
-      </div>
+    <app-life-care-print-chrome
+      [patientName]="r.patientName"
+      [dateText]="printedAt() | date: 'dd/MM/yyyy'"
+      [referredBy]="''"
+      [patientId]="r.patientMrn"
+    >
       @if (r.createdByName) {
-        <div class="lc-field-row lab-tech-line">
-          <span class="lc-label">Prepared by</span>
-          <span class="lc-line lc-line-fill lc-line-long">{{ r.createdByName }}</span>
+        <div lc-after-patient class="lab-after-patient">
+          <div class="lc-field-row lab-tech-line">
+            <span class="lc-label">Prepared by</span>
+            <span class="lc-line lc-line-fill lc-line-long">{{ r.createdByName }}</span>
+          </div>
         </div>
       }
-    </section>
 
-    <div class="lc-rule"></div>
+      <div class="lab-doc-body">
+        <div class="lc-rule"></div>
 
-    @if (hasRichBody()) {
-      <section class="lab-rich-print" [innerHTML]="richBodyHtml()"></section>
-    } @else {
-      @for (f of orderedFields(r.fieldsSchema); track f.key) {
-        <section class="lab-field-block">
-          <h2 class="lab-field-title">{{ f.label }}</h2>
-          <div class="lab-field-body">{{ fieldValue(f.key) }}</div>
-        </section>
-      }
-    }
+        @if (hasRichBody()) {
+          <section class="lab-rich-print" [innerHTML]="richBodyHtml()"></section>
+        } @else {
+          @for (f of orderedFields(r.fieldsSchema); track f.key) {
+            <section class="lab-field-block">
+              <h2 class="lab-field-title">{{ f.label }}</h2>
+              <div class="lab-field-body">{{ fieldValue(f.key) }}</div>
+            </section>
+          }
+        }
 
-    <div class="lab-sig-block">
-      <div class="lab-sig-line"></div>
-      <div class="lab-sig-label">Radiologist / Sonologist / Technician</div>
-    </div>
-
-    <p class="lc-system-footer">
-      {{ branding.productShortName }} — {{ branding.designedByLine }} ·
-      {{ branding.companyWebsiteDisplay }} · {{ branding.clinicPhoneDisplay }}
-    </p>
+        <div class="lab-sig-block">
+          <div class="lab-sig-line"></div>
+          <div class="lab-sig-label">Radiologist / Sonologist / Technician</div>
+        </div>
+      </div>
+    </app-life-care-print-chrome>
   </div>
 }

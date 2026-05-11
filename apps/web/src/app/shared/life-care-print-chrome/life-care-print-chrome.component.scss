@@ -1,0 +1,202 @@
+/* Life Care letterhead — matches clinic report template colors */
+$lc-blue: #0070c0;
+$lc-navy: #002060;
+$lc-red: #c00000;
+$lc-line-blue: #5b9bd5;
+
+.lc-print-chrome {
+  display: block;
+}
+
+.lc-doc-bar-top {
+  height: 6px;
+  background: $lc-blue;
+  margin: 0 0 2px;
+  border-radius: 0;
+}
+
+.lc-doc-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0 10px;
+}
+
+.lc-doc-logo-img {
+  height: 52px;
+  width: auto;
+  max-width: 110px;
+  object-fit: contain;
+  display: block;
+}
+
+.lc-doc-main-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.lc-doc-title-blue {
+  color: $lc-blue;
+}
+
+.lc-doc-title-red {
+  color: $lc-red;
+}
+
+.lc-patient-box-double {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 3px double #000;
+  margin: 4px 0 10px;
+  font-size: 11px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.lc-pbox-cell {
+  padding: 7px 10px;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  min-height: 2em;
+  box-sizing: border-box;
+}
+
+.lc-pbox-cell-right {
+  border-right: none;
+}
+
+.lc-pbox-cell-bottom {
+  border-bottom: none;
+}
+
+.lc-pbox-label {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.lc-pbox-value {
+  font-weight: 600;
+}
+
+.lc-doc-footer {
+  margin-top: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+}
+
+.lc-doc-footer-upper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 20px;
+  align-items: start;
+  margin-bottom: 6px;
+  font-size: 10px;
+}
+
+.lc-doc-addr {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.lc-doc-pin {
+  flex: 0 0 auto;
+  color: $lc-red;
+  margin-top: 1px;
+}
+
+.lc-doc-pin svg {
+  display: block;
+}
+
+.lc-doc-doctor {
+  text-align: right;
+  line-height: 1.3;
+}
+
+.lc-doc-doctor-name {
+  font-weight: 800;
+  font-size: 10.5px;
+}
+
+.lc-doc-doctor-quals {
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.lc-doc-24-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.lc-doc-24-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.lc-doc-24-num {
+  font-size: 22px;
+  color: $lc-red;
+  letter-spacing: -0.02em;
+}
+
+.lc-doc-24-hours {
+  font-size: 9px;
+  color: $lc-red;
+  margin-top: 2px;
+  letter-spacing: 0.06em;
+}
+
+.lc-doc-24-service {
+  margin-top: 4px;
+  background: $lc-blue;
+  color: #fff;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  font-weight: 800;
+}
+
+.lc-doc-bar-bottom {
+  display: flex;
+  align-items: center;
+  background: $lc-navy;
+  color: #fff;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.lc-doc-bar-line {
+  flex: 1;
+  height: 1px;
+  background: $lc-line-blue;
+  min-width: 8px;
+}
+
+.lc-doc-bar-phone {
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.lc-system-footer {
+  margin: 8px 0 0;
+  padding-top: 4px;
+  font-size: 7.5pt;
+  text-align: center;
+  color: #444;
+  line-height: 1.35;
+}

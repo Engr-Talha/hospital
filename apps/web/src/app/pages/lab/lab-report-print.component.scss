@@ -12,12 +12,13 @@
   break-before: auto !important;
 }
 
-.lab-doc-meta {
-  margin-top: 4px;
+.lab-after-patient .lab-tech-line {
+  margin-top: 0;
+  margin-bottom: 6px;
 }
 
-.lab-tech-line {
-  margin-top: 6px;
+.lab-doc-body {
+  display: block;
 }
 
 .lab-field-block {

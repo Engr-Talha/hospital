@@ -36,6 +36,8 @@ export interface CreatePatientDto {
   gender: Gender;
   /** Whole years as entered at registration (not derived from DOB). */
   age: number;
+  /** ISO date YYYY-MM-DD; optional for legacy rows / sync safety. */
+  dob?: string | null;
   /** Doctor user id for this visit / appointment */
   appointmentDoctorId: string;
   phone?: string;
@@ -60,6 +62,8 @@ export interface Patient {
   lastName: string;
   gender: Gender;
   age: number;
+  /** ISO date YYYY-MM-DD when stored. */
+  dob?: string | null;
   phone?: string | null;
   address?: string | null;
   bloodGroup?: BloodGroup | null;

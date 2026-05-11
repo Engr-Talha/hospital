@@ -6,12 +6,13 @@ import { Button } from 'primeng/button';
 import { APP_BRANDING } from '../../core/branding';
 import { PatientFeesService } from '../../core/patient-fees.service';
 import { PatientsService } from '../../core/patients.service';
+import { LifeCarePrintChromeComponent } from '../../shared/life-care-print-chrome/life-care-print-chrome.component';
 
 export type FeeSlipLayoutMode = 'a4' | 'pos';
 
 @Component({
   selector: 'app-fee-slip-print',
-  imports: [Button, DatePipe],
+  imports: [Button, DatePipe, LifeCarePrintChromeComponent],
   templateUrl: './fee-slip-print.component.html',
   styleUrl: './fee-slip-print.component.scss',
 })

@@ -12,6 +12,12 @@ export const APP_BRANDING = {
   /** Clinic contact on printed slips (Life Care header/footer). */
   clinicPhoneDisplay: '0334-9062009',
   clinicPhoneTel: '+923349062009',
+  /** Full address line on report / slip footers (letterhead). */
+  clinicAddressPrint:
+    'Near Noor Din Hotel, Opposite Chongi No1, Main Makhad Road Jand (Attock)',
+  /** Shown on printed diagnostics reports (footer, right). */
+  reportFooterDoctorName: 'DR NEELAM ARSHAD',
+  reportFooterDoctorQuals: 'MBBS, DMRD',
   /** Vendor / HIS support (shell, login). */
   supportPhoneDisplay: '0310-5071527',
   supportPhoneTel: '+923105071527',

@@ -10,149 +10,99 @@
 
 @if (patient(); as p) {
   <div class="print-area life-care-slip">
-    <header class="lc-top">
-      <div class="lc-brand-row">
-        <div class="lc-en-title">THE LIFE CARE MEDICAL CENTER</div>
-        <div class="lc-logo-wrap">
-          <img
-            class="lc-logo-img"
-            src="/assets/life-care-logo.jpeg"
-            alt="THE LIFE CARE"
-          />
+    <app-life-care-print-chrome
+      [patientName]="patientFullName(p)"
+      [dateText]="printedAt() | date: 'dd/MM/yyyy'"
+      [referredBy]="p.appointmentDoctor?.name ?? ''"
+      [patientId]="p.mrn"
+    >
+      <div lc-after-patient>
+        <div class="lc-field-row lc-age-gender">
+          <div class="lc-field-inline">
+            <span class="lc-label">Age</span>
+            <span class="lc-line lc-line-fill lc-line-short">{{ p.age }}</span>
+          </div>
+          <div class="lc-gender-block">
+            <span class="lc-label">Gender</span>
+            <span
+              class="lc-gm"
+              [class.lc-gm-on]="p.gender === Gender.FEMALE"
+              >F</span
+            >
+            <span class="lc-gm-sep">/</span>
+            <span class="lc-gm" [class.lc-gm-on]="p.gender === Gender.MALE"
+              >M</span
+            >
+            @if (p.gender === Gender.OTHER) {
+              <span class="lc-gm lc-gm-on"> / O</span>
+            }
+          </div>
         </div>
-        <div class="lc-ur-title" dir="rtl">دی لائف کیئر میڈیکل سینٹر</div>
       </div>
-      <div class="lc-black-bar">
-        Opposite Pin School Main Makhad Road Jand, District Attock &nbsp;·&nbsp;
-        {{ branding.clinicPhoneDisplay }}
-      </div>
-      <div class="lc-pills">
-        <span class="lc-pill" dir="rtl">لیباریٹری</span>
-        <span class="lc-pill" dir="rtl">ایکس رے</span>
-        <span class="lc-pill" dir="rtl">الٹراساؤنڈ</span>
-        <span class="lc-pill" dir="rtl">ای سی جی</span>
-        <span class="lc-pill" dir="rtl">ایکو کارڈیوگرافی</span>
-      </div>
-      <div class="lc-banner-row">
-        <div class="lc-badge-24">
-          <span class="lc-24-ring">24</span>
-          <span class="lc-24-text">HOUR<br />SERVICE</span>
-        </div>
-        <p class="lc-ur-banner" dir="rtl">
-          ڈاکٹروں کی نگرانی میں چوبیس گھنٹے کی سروس
-        </p>
-      </div>
-    </header>
 
-    <section class="lc-patient-block">
-      <div class="lc-ref-date">
-        <div class="lc-field-inline">
-          <span class="lc-label">Ref#</span>
-          <span class="lc-line lc-line-fill">{{ p.mrn }}</span>
-        </div>
-        <div class="lc-field-inline lc-field-right">
-          <span class="lc-label">Date</span>
-          <span class="lc-line lc-line-fill">{{
-            printedAt() | date: 'dd/MM/yyyy'
-          }}</span>
-        </div>
-      </div>
-      <div class="lc-field-row">
-        <span class="lc-label">Patient's Name</span>
-        <span class="lc-line lc-line-fill lc-line-long">{{
-          patientFullName(p)
-        }}</span>
-      </div>
-      <div class="lc-field-row lc-age-gender">
-        <div class="lc-field-inline">
-          <span class="lc-label">Age</span>
-          <span class="lc-line lc-line-fill lc-line-short">{{ p.age }}</span>
-        </div>
-        <div class="lc-gender-block">
-          <span class="lc-label">Gender</span>
-          <span
-            class="lc-gm"
-            [class.lc-gm-on]="p.gender === Gender.FEMALE"
-            >F</span
-          >
-          <span class="lc-gm-sep">/</span>
-          <span class="lc-gm" [class.lc-gm-on]="p.gender === Gender.MALE"
-            >M</span
-          >
-          @if (p.gender === Gender.OTHER) {
-            <span class="lc-gm lc-gm-on"> / O</span>
-          }
-        </div>
-      </div>
-    </section>
+      <div class="patient-slip-body">
+        <div class="lc-rule"></div>
 
-    <div class="lc-rule"></div>
-
-    <div class="lc-main">
-      <aside class="lc-sidebar" dir="ltr">
-        <div class="lc-side-group">
-          <div class="lc-side-title">Vitals</div>
-          <div class="lc-kv"><span>BP</span><span class="lc-dots"></span></div>
-          <div class="lc-kv"><span>Temp</span><span class="lc-dots"></span></div>
-          <div class="lc-kv"><span>Puls</span><span class="lc-dots"></span></div>
-          <div class="lc-kv"><span>Spo2</span><span class="lc-dots"></span></div>
-          <div class="lc-kv"><span>HTN</span><span class="lc-dots"></span></div>
-          <div class="lc-kv"><span>DM</span><span class="lc-dots"></span></div>
-        </div>
-        <div class="lc-side-group">
-          <div class="lc-side-title">History and Diagnosis</div>
-          @if (p.phone) {
-            <div class="lc-note-line">Tel: {{ p.phone }}</div>
-          }
-          @if (p.address) {
-            <div class="lc-note-line">{{ p.address }}</div>
-          }
-          @if (p.appointmentDoctor) {
-            <div class="lc-note-line">
-              Doctor: {{ p.appointmentDoctor.name }} ({{
-                p.appointmentDoctor.medicalField
-              }})
+        <div class="lc-main">
+          <aside class="lc-sidebar" dir="ltr">
+            <div class="lc-side-group">
+              <div class="lc-side-title">Vitals</div>
+              <div class="lc-kv"><span>BP</span><span class="lc-dots"></span></div>
+              <div class="lc-kv"><span>Temp</span><span class="lc-dots"></span></div>
+              <div class="lc-kv"><span>Puls</span><span class="lc-dots"></span></div>
+              <div class="lc-kv"><span>Spo2</span><span class="lc-dots"></span></div>
+              <div class="lc-kv"><span>HTN</span><span class="lc-dots"></span></div>
+              <div class="lc-kv"><span>DM</span><span class="lc-dots"></span></div>
             </div>
-          }
-          @if (p.bloodGroup) {
-            <div class="lc-note-line">Blood group: {{ p.bloodGroup }}</div>
-          }
-          @if (p.notes) {
-            <div class="lc-note-line">{{ p.notes }}</div>
-          }
-          <div class="lc-blank-line"></div>
-          <div class="lc-blank-line"></div>
-          <div class="lc-blank-line"></div>
+            <div class="lc-side-group">
+              <div class="lc-side-title">History and Diagnosis</div>
+              @if (p.phone) {
+                <div class="lc-note-line">Tel: {{ p.phone }}</div>
+              }
+              @if (p.address) {
+                <div class="lc-note-line">{{ p.address }}</div>
+              }
+              @if (p.appointmentDoctor) {
+                <div class="lc-note-line">
+                  Doctor: {{ p.appointmentDoctor.name }} ({{
+                    p.appointmentDoctor.medicalField
+                  }})
+                </div>
+              }
+              @if (p.bloodGroup) {
+                <div class="lc-note-line">Blood group: {{ p.bloodGroup }}</div>
+              }
+              @if (p.notes) {
+                <div class="lc-note-line">{{ p.notes }}</div>
+              }
+              <div class="lc-blank-line"></div>
+              <div class="lc-blank-line"></div>
+              <div class="lc-blank-line"></div>
+            </div>
+            <div class="lc-side-group">
+              <div class="lc-side-title">Investigations</div>
+              <div class="lc-blank-line"></div>
+              <div class="lc-blank-line"></div>
+              <div class="lc-blank-line"></div>
+              <div class="lc-blank-line"></div>
+            </div>
+          </aside>
+          <div class="lc-vsep" aria-hidden="true"></div>
+          <main class="lc-rx-panel">
+            <div class="lc-rx-header">
+              <span class="lc-rx-symbol">Rx</span>
+              <span class="lc-court">Not valid for court.</span>
+            </div>
+            <div class="lc-rx-space">
+              @if (p.registeredBy) {
+                <p class="lc-reg-meta">
+                  Registered by: {{ p.registeredBy.name }} · Age: {{ p.age }} yrs
+                </p>
+              }
+            </div>
+          </main>
         </div>
-        <div class="lc-side-group">
-          <div class="lc-side-title">Investigations</div>
-          <div class="lc-blank-line"></div>
-          <div class="lc-blank-line"></div>
-          <div class="lc-blank-line"></div>
-          <div class="lc-blank-line"></div>
-        </div>
-      </aside>
-      <div class="lc-vsep" aria-hidden="true"></div>
-      <main class="lc-rx-panel">
-        <div class="lc-rx-header">
-          <span class="lc-rx-symbol">Rx</span>
-          <span class="lc-court">Not valid for court.</span>
-        </div>
-        <div class="lc-rx-space">
-          @if (p.registeredBy) {
-            <p class="lc-reg-meta">
-              Registered by: {{ p.registeredBy.name }} · Age: {{ p.age }} yrs
-            </p>
-          }
-        </div>
-        <p class="lc-rx-footer-ur" dir="rtl">
-          مکھد روڈ جند، ضلع اٹک — {{ branding.clinicPhoneDisplay }}
-        </p>
-      </main>
-    </div>
-    <p class="lc-system-footer">
-      {{ branding.productShortName }} — {{ branding.designedByLine }} ·
-      {{ branding.companyWebsiteDisplay }} · {{ branding.clinicPhoneDisplay }}
-    </p>
+      </div>
+    </app-life-care-print-chrome>
   </div>
 }

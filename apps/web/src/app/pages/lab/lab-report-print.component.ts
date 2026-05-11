@@ -14,12 +14,12 @@ import { LabReportFieldSchema, LabReportRecordDetail } from '@hospital/shared';
 import html2pdf from 'html2pdf.js';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
-import { APP_BRANDING } from '../../core/branding';
 import { LabReportsApiService } from '../../core/lab-reports-api.service';
+import { LifeCarePrintChromeComponent } from '../../shared/life-care-print-chrome/life-care-print-chrome.component';
 
 @Component({
   selector: 'app-lab-report-print',
-  imports: [Button, DatePipe, Tooltip],
+  imports: [Button, DatePipe, Tooltip, LifeCarePrintChromeComponent],
   templateUrl: './lab-report-print.component.html',
   styleUrl: './lab-report-print.component.scss',
 })
@@ -36,7 +36,6 @@ export class LabReportPrintComponent implements OnInit, OnDestroy {
   readonly record = signal<LabReportRecordDetail | null>(null);
   readonly printedAt = signal(new Date());
   readonly pdfBusy = signal(false);
-  readonly branding = APP_BRANDING;
 
   ngOnInit(): void {
     this.previousTitle = this.title.getTitle();

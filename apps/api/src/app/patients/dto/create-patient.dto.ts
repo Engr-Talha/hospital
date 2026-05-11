@@ -1,6 +1,7 @@
 import { BloodGroup, Gender } from '@hospital/shared';
 import { Type } from 'class-transformer';
 import {
+  IsDateString,
   IsEnum,
   IsInt,
   IsOptional,
@@ -28,6 +29,10 @@ export class CreatePatientBodyDto {
   @Min(0)
   @Max(130)
   age!: number;
+
+  @IsOptional()
+  @IsDateString()
+  dob?: string;
 
   @IsUUID()
   appointmentDoctorId!: string;

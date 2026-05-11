@@ -29,6 +29,10 @@ export class PatientEntity {
   @Column({ type: 'int' })
   age!: number;
 
+  /** Optional; keep nullable so TypeORM sync can add the column with existing patient rows. */
+  @Column({ type: 'date', nullable: true })
+  dob!: Date | null;
+
   @Column({ type: 'varchar', nullable: true })
   phone!: string | null;
 

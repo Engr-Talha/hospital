@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -15,6 +16,15 @@ import {
 import { Repository } from 'typeorm';
 import { DoctorsService } from '../doctors/doctors.service';
 import { PatientEntity } from './patient.entity';
+
+/** Store YYYY-MM-DD as a UTC calendar date (avoids TZ shifting the day). */
+function dateFromYmd(ymd: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd.trim());
+  if (!m) {
+    throw new BadRequestException('dob must be YYYY-MM-DD');
+  }
+  return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+}
 
 @Injectable()
 export class PatientsService {
@@ -44,6 +54,11 @@ export class PatientsService {
       lastName: entity.lastName,
       gender: entity.gender,
       age: entity.age,
+      dob: entity.dob
+        ? entity.dob instanceof Date
+          ? entity.dob.toISOString().slice(0, 10)
+          : String(entity.dob).slice(0, 10)
+        : null,
       phone: entity.phone,
       address: entity.address,
       bloodGroup: entity.bloodGroup,
@@ -83,6 +98,7 @@ export class PatientsService {
       lastName: dto.lastName.trim(),
       gender: dto.gender,
       age: dto.age,
+      dob: dto.dob?.trim() ? dateFromYmd(dto.dob) : null,
       phone: dto.phone?.trim() || null,
       address: dto.address?.trim() || null,
       bloodGroup: dto.bloodGroup ?? null,
@@ -153,6 +169,9 @@ export class PatientsService {
     if (patch.lastName !== undefined) entity.lastName = patch.lastName.trim();
     if (patch.gender !== undefined) entity.gender = patch.gender;
     if (patch.age !== undefined) entity.age = patch.age;
+    if (patch.dob !== undefined) {
+      entity.dob = patch.dob?.trim() ? dateFromYmd(patch.dob) : null;
+    }
     if (patch.phone !== undefined)
       entity.phone = patch.phone?.trim() || null;
     if (patch.address !== undefined)
