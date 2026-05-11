@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { FinancialReportsModule } from './financial-reports/financial-reports.module';
 import { FeeCatalogItemEntity } from './fee-catalog/fee-catalog-item.entity';
 import { FeeCatalogModule } from './fee-catalog/fee-catalog.module';
 import { TrialSettingsEntity } from './trial/trial-settings.entity';
@@ -51,6 +52,7 @@ import { UsersModule } from './users/users.module';
     FeeCatalogModule,
     PatientFeesModule,
     DashboardModule,
+    FinancialReportsModule,
     LabReportsModule,
     TrialModule,
     DoctorsModule,

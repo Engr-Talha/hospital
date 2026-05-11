@@ -22,4 +22,6 @@ export const APP_BRANDING = {
   supportPhoneDisplay: '0310-5071527',
   supportPhoneTel: '+923105071527',
   designedByLine: 'Software designed by Malgray Labs',
+  /** Small print credit on letterhead (lab / fee A4). */
+  developerCreditPrint: 'Developed by Malgray Labs',
 } as const;

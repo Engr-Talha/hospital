@@ -20,6 +20,7 @@
   <div
     class="print-area life-care-slip fee-slip"
     [class.fee-slip--pos]="layoutMode() === 'pos'"
+    [class.print-area--letterhead]="layoutMode() === 'a4'"
   >
     @if (layoutMode() === 'a4') {
       <app-life-care-print-chrome
@@ -27,6 +28,9 @@
         [dateText]="printedAt() | date: dateFormatForPrint()"
         [referredBy]="p.appointmentDoctor?.name ?? ''"
         [patientId]="p.mrn"
+        [checkedBy]="
+          branding.reportFooterDoctorName + ' (' + branding.reportFooterDoctorQuals + ')'
+        "
       >
         <div lc-after-patient>
           <div class="lc-field-row lc-age-gender">

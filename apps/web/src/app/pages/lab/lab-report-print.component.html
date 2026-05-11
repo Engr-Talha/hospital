@@ -24,24 +24,21 @@
 </div>
 
 @if (record(); as r) {
-  <div #printRoot class="print-area life-care-slip lab-doc">
+  <div #printRoot class="print-area life-care-slip lab-doc print-area--letterhead">
     <app-life-care-print-chrome
       [patientName]="r.patientName"
-      [dateText]="printedAt() | date: 'dd/MM/yyyy'"
+      [dateText]="printedAt() | date: 'dd/MM/yyyy, h:mm a'"
       [referredBy]="''"
       [patientId]="r.patientMrn"
+      [checkedBy]="
+        branding.reportFooterDoctorName + ' (' + branding.reportFooterDoctorQuals + ')'
+      "
+      [showDoctorInFooter]="true"
+      [showVendorFooter]="false"
     >
-      @if (r.createdByName) {
-        <div lc-after-patient class="lab-after-patient">
-          <div class="lc-field-row lab-tech-line">
-            <span class="lc-label">Prepared by</span>
-            <span class="lc-line lc-line-fill lc-line-long">{{ r.createdByName }}</span>
-          </div>
-        </div>
-      }
-
       <div class="lab-doc-body">
         <div class="lc-rule"></div>
+        <p class="lab-court-disclaimer">Not valid for court.</p>
 
         @if (hasRichBody()) {
           <section class="lab-rich-print" [innerHTML]="richBodyHtml()"></section>
@@ -54,10 +51,6 @@
           }
         }
 
-        <div class="lab-sig-block">
-          <div class="lab-sig-line"></div>
-          <div class="lab-sig-label">Radiologist / Sonologist / Technician</div>
-        </div>
       </div>
     </app-life-care-print-chrome>
   </div>

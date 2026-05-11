@@ -65,6 +65,13 @@ body {
     margin: 0 !important;
   }
 
+  .print-area.life-care-slip.print-area--letterhead {
+    /* Must not exceed one printable page or the browser adds a blank 2nd page */
+    min-height: calc(297mm - 30mm) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
   .print-area.fee-slip--pos {
     page: receipt;
     width: 76mm;

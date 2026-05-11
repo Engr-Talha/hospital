@@ -1,21 +1,25 @@
 <div class="lc-print-chrome">
-  <div class="lc-doc-bar-top" aria-hidden="true"></div>
+  <div class="lc-print-chrome-head">
+    <div class="lc-doc-bar-top" aria-hidden="true"></div>
 
-  <header class="lc-doc-header">
-    <div class="lc-doc-logo">
-      <img
-        class="lc-doc-logo-img"
-        src="/assets/life-care-logo.jpeg"
-        alt="THE LIFE CARE MEDICAL CENTER"
-      />
-    </div>
-    <div class="lc-doc-title-block">
-      <h1 class="lc-doc-main-title">
-        <span class="lc-doc-title-blue">THE LIFE CARE</span>
-        <span class="lc-doc-title-red"> MEDICAL CENTER</span>
-      </h1>
-    </div>
-  </header>
+    <header class="lc-doc-header">
+      <div class="lc-doc-logo">
+        <img
+          class="lc-doc-logo-img"
+          src="/assets/life-care-logo.jpeg"
+          alt="THE LIFE CARE MEDICAL CENTER"
+        />
+      </div>
+      <div class="lc-doc-title-block">
+        <h1 class="lc-doc-main-title">
+          <span class="lc-doc-the">THE</span>
+          <span class="lc-doc-title-line">
+            <span class="lc-doc-life-care">LIFE CARE</span>
+            <span class="lc-doc-medical-center"> MEDICAL CENTER</span>
+          </span>
+        </h1>
+      </div>
+    </header>
 
   <section class="lc-patient-box-double" aria-label="Patient details">
     <div class="lc-pbox-cell">
@@ -26,44 +30,53 @@
       <span class="lc-pbox-label">Date:</span>
       <span class="lc-pbox-value">{{ dateText() || '—' }}</span>
     </div>
-    <div class="lc-pbox-cell lc-pbox-cell-bottom">
+    <div class="lc-pbox-cell">
       <span class="lc-pbox-label">Referred by:</span>
       <span class="lc-pbox-value">{{ referredByDisplay() }}</span>
     </div>
-    <div class="lc-pbox-cell lc-pbox-cell-right lc-pbox-cell-bottom">
+    <div class="lc-pbox-cell lc-pbox-cell-right">
       <span class="lc-pbox-label">Patient ID #</span>
       <span class="lc-pbox-value">{{ patientId() }}</span>
     </div>
+    <div class="lc-pbox-cell lc-pbox-cell-span lc-pbox-cell-bottom">
+      <span class="lc-pbox-label">Checked by:</span>
+      <span class="lc-pbox-value">{{ checkedByDisplay() }}</span>
+    </div>
   </section>
 
-  <ng-content select="[lc-after-patient]"></ng-content>
-  <ng-content></ng-content>
+    <ng-content select="[lc-after-patient]"></ng-content>
+  </div>
+
+  <div class="lc-print-chrome-main">
+    <ng-content></ng-content>
+  </div>
 
   <footer class="lc-doc-footer">
-    <div class="lc-doc-footer-upper">
-      <div class="lc-doc-addr">
-        <span class="lc-doc-pin" aria-hidden="true">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-            />
-          </svg>
-        </span>
-        <span class="lc-doc-addr-text">{{ branding.clinicAddressPrint }}</span>
+    <div class="lc-doc-footer-midrow">
+      <div class="lc-doc-footer-left">
+        @if (showDoctorInFooter()) {
+          <div class="lc-doc-doctor-below">
+            <div class="lc-doc-doctor-name">{{ branding.reportFooterDoctorName }}</div>
+            <div class="lc-doc-doctor-quals">{{ branding.reportFooterDoctorQuals }}</div>
+          </div>
+        }
+        <div class="lc-doc-addr">
+          <span class="lc-doc-pin" aria-hidden="true">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+              />
+            </svg>
+          </span>
+          <span class="lc-doc-addr-text">{{ branding.clinicAddressPrint }}</span>
+        </div>
       </div>
-      <div class="lc-doc-doctor">
-        <div class="lc-doc-doctor-name">{{ branding.reportFooterDoctorName }}</div>
-        <div class="lc-doc-doctor-quals">{{ branding.reportFooterDoctorQuals }}</div>
-      </div>
-    </div>
-
-    <div class="lc-doc-24-row">
       <div class="lc-doc-24-badge" aria-label="24 hours service">
         <span class="lc-doc-24-num">24</span>
         <span class="lc-doc-24-hours">HOURS</span>
@@ -78,8 +91,12 @@
     </div>
   </footer>
 
-  <p class="lc-system-footer">
-    {{ branding.productShortName }} — {{ branding.designedByLine }} ·
-    {{ branding.companyWebsiteDisplay }} · {{ branding.clinicPhoneDisplay }}
-  </p>
+  <p class="lc-developer-credit">{{ branding.developerCreditPrint }}</p>
+
+  @if (showVendorFooter()) {
+    <p class="lc-system-footer">
+      {{ branding.productShortName }} — {{ branding.designedByLine }} ·
+      {{ branding.companyWebsiteDisplay }} · {{ branding.clinicPhoneDisplay }}
+    </p>
+  }
 </div>

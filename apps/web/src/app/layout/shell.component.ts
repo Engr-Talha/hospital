@@ -81,6 +81,11 @@ export class ShellComponent implements OnInit {
         icon: 'pi pi-shield',
         items: [
           {
+            label: 'Revenue & lab reports',
+            icon: 'pi pi-chart-bar',
+            routerLink: ['/admin/revenue-reports'],
+          },
+          {
             label: 'Users',
             icon: 'pi pi-users',
             routerLink: ['/admin/users'],

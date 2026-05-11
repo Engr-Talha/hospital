@@ -47,6 +47,15 @@ export const appRoutes: Route[] = [
         data: { roles: [Role.ADMIN] },
       },
       {
+        path: 'admin/revenue-reports',
+        loadComponent: () =>
+          import('./pages/admin/admin-revenue-report.component').then(
+            (m) => m.AdminRevenueReportComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN] },
+      },
+      {
         path: 'reception/desk',
         loadComponent: () =>
           import('./pages/reception/reception-desk.component').then(

@@ -1,0 +1,305 @@
+<p-toast />
+<div class="rev-head">
+  <div>
+    <h1 class="rev-title">Revenue &amp; lab records</h1>
+    <p class="rev-sub">
+      Charge lines are counted by <strong>posted date</strong> (when the fee was
+      entered). Doctor totals use the patient’s <strong>current</strong> assigned
+      doctor. Lab fees are lines whose catalog item is linked to a
+      <strong>lab report template</strong> (configure under Lab report templates).
+    </p>
+  </div>
+</div>
+
+<p-card>
+  <div class="rev-filters">
+    <label class="rev-field">
+      <span>From</span>
+      <input type="date" [(ngModel)]="fromDate" name="fromDate" />
+    </label>
+    <label class="rev-field">
+      <span>To</span>
+      <input type="date" [(ngModel)]="toDate" name="toDate" />
+    </label>
+    <label class="rev-field rev-grow">
+      <span>Breakdown</span>
+      <p-select
+        [options]="groupOptions"
+        [(ngModel)]="groupBy"
+        optionLabel="label"
+        optionValue="value"
+        [style]="{ width: '100%' }"
+      />
+    </label>
+    <div class="rev-presets">
+      <p-button
+        label="This week"
+        severity="secondary"
+        (onClick)="applyPresetWeek(); load()"
+      />
+      <p-button
+        label="This month"
+        severity="secondary"
+        (onClick)="applyPresetMonth(); load()"
+      />
+      <p-button
+        label="Last 7 days"
+        severity="secondary"
+        (onClick)="applyPresetLastDays(7); load()"
+      />
+      <p-button
+        label="Last 30 days"
+        severity="secondary"
+        (onClick)="applyPresetLastDays(30); load()"
+      />
+      <p-button label="Apply" icon="pi pi-search" (onClick)="load()" />
+    </div>
+  </div>
+</p-card>
+
+@if (loading()) {
+  <div class="rev-loading">
+    <p-progressSpinner strokeWidth="4" />
+    <span>Loading…</span>
+  </div>
+} @else if (report(); as r) {
+  <div class="rev-summary">
+    <p-card styleClass="rev-stat">
+      <div class="rev-stat-inner">
+        <span class="rev-stat-label">All fees (range)</span>
+        <span class="rev-stat-value">{{ r.grandTotalFees | number: '1.2-2' }}</span>
+        <span class="rev-stat-hint">{{ r.grandTotalFeeLines }} line items</span>
+      </div>
+    </p-card>
+    <p-card styleClass="rev-stat rev-stat-accent">
+      <div class="rev-stat-inner">
+        <span class="rev-stat-label">Lab catalog fees</span>
+        <span class="rev-stat-value">{{ r.grandTotalLabFees | number: '1.2-2' }}</span>
+        <span class="rev-stat-hint">{{ r.grandTotalLabFeeLines }} lab-linked lines</span>
+      </div>
+    </p-card>
+    <p-card styleClass="rev-stat">
+      <div class="rev-stat-inner">
+        <span class="rev-stat-label">Lab reports filed</span>
+        <span class="rev-stat-value">{{ r.totalLabReports }}</span>
+        <span class="rev-stat-hint">Reports created in range</span>
+      </div>
+    </p-card>
+  </div>
+
+  @if (r.labFeeBuckets.length) {
+    <p-card header="Lab fee revenue by period" styleClass="mt-card">
+      <p-table [value]="r.labFeeBuckets" [tableStyle]="{ 'min-width': '100%' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Period</th>
+            <th class="num">Lines</th>
+            <th class="num">Total</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.periodLabel }}</td>
+            <td class="num">{{ row.lineCount }}</td>
+            <td class="num">{{ row.total | number: '1.2-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+
+  <p-card header="Fees posted by receptionist" styleClass="mt-card">
+    <p-table
+      [value]="r.receptionists"
+      dataKey="userId"
+      [tableStyle]="{ 'min-width': '100%' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem"></th>
+          <th>Name</th>
+          <th>Email</th>
+          <th class="num">Lines</th>
+          <th class="num">Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-expanded="expanded">
+        <tr>
+          <td>
+            <p-button
+              type="button"
+              [pRowToggler]="row"
+              [text]="true"
+              [rounded]="true"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            />
+          </td>
+          <td>{{ row.name }}</td>
+          <td>{{ row.email }}</td>
+          <td class="num">{{ row.lineCount }}</td>
+          <td class="num">{{ row.total | number: '1.2-2' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="expandedrow" let-row>
+        <tr>
+          <td colspan="5">
+            <p-table [value]="row.buckets" styleClass="rev-nested">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Period</th>
+                  <th class="num">Lines</th>
+                  <th class="num">Total</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-b>
+                <tr>
+                  <td>{{ b.periodLabel }}</td>
+                  <td class="num">{{ b.lineCount }}</td>
+                  <td class="num">{{ b.total | number: '1.2-2' }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="3">No lines in this range.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No receptionist-posted fees in this range.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-card header="Fees attributed to doctors (by patient assignment)" styleClass="mt-card">
+    <p-table [value]="r.doctors" dataKey="userId" [tableStyle]="{ 'min-width': '100%' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem"></th>
+          <th>Doctor</th>
+          <th>Email</th>
+          <th class="num">Lines</th>
+          <th class="num">Total</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-expanded="expanded">
+        <tr>
+          <td>
+            <p-button
+              type="button"
+              [pRowToggler]="row"
+              [text]="true"
+              [rounded]="true"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            />
+          </td>
+          <td>{{ row.name }}</td>
+          <td>{{ row.email }}</td>
+          <td class="num">{{ row.lineCount }}</td>
+          <td class="num">{{ row.total | number: '1.2-2' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="expandedrow" let-row>
+        <tr>
+          <td colspan="5">
+            <p-table [value]="row.buckets" styleClass="rev-nested">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Period</th>
+                  <th class="num">Lines</th>
+                  <th class="num">Total</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-b>
+                <tr>
+                  <td>{{ b.periodLabel }}</td>
+                  <td class="num">{{ b.lineCount }}</td>
+                  <td class="num">{{ b.total | number: '1.2-2' }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="3">No lines in this range.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">
+            No fee lines for patients with an assigned doctor in this range.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-card header="Lab reports filed (by staff)" styleClass="mt-card">
+    <p-table
+      [value]="r.labReportsByCreator"
+      dataKey="userId"
+      [tableStyle]="{ 'min-width': '100%' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem"></th>
+          <th>Name</th>
+          <th>Email</th>
+          <th class="num">Reports</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row let-expanded="expanded">
+        <tr>
+          <td>
+            <p-button
+              type="button"
+              [pRowToggler]="row"
+              [text]="true"
+              [rounded]="true"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            />
+          </td>
+          <td>{{ row.name }}</td>
+          <td>{{ row.email }}</td>
+          <td class="num">{{ row.reportCount }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="expandedrow" let-row>
+        <tr>
+          <td colspan="4">
+            <p-table [value]="row.buckets" styleClass="rev-nested">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Period</th>
+                  <th class="num">Reports</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-b>
+                <tr>
+                  <td>{{ b.periodLabel }}</td>
+                  <td class="num">{{ b.reportCount }}</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="2">No reports in this range.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">No lab reports in this range.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+}

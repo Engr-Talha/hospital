@@ -4,14 +4,38 @@ $lc-navy: #002060;
 $lc-red: #c00000;
 $lc-line-blue: #5b9bd5;
 
-.lc-print-chrome {
+:host {
   display: block;
 }
 
+/* Fill first print page: parent .print-area--letterhead is flex column + min-height A4 */
+:host-context(.print-area--letterhead) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.lc-print-chrome {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.lc-print-chrome-head {
+  flex: 0 0 auto;
+}
+
+.lc-print-chrome-main {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .lc-doc-bar-top {
-  height: 6px;
+  height: 8px;
   background: $lc-blue;
-  margin: 0 0 2px;
+  margin: 0 0 4px;
   border-radius: 0;
 }
 
@@ -19,34 +43,68 @@ $lc-line-blue: #5b9bd5;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
-  padding: 6px 0 10px;
+  gap: 14px;
+  padding: 4px 0 12px;
 }
 
 .lc-doc-logo-img {
-  height: 52px;
+  height: 56px;
   width: auto;
-  max-width: 110px;
+  max-width: 120px;
   object-fit: contain;
   display: block;
 }
 
+.lc-doc-title-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* THE (small) above LIFE CARE; MEDICAL CENTER same line, slightly smaller red */
 .lc-doc-main-title {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0;
+  row-gap: 1px;
   margin: 0;
+  padding: 0;
+  align-items: end;
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.lc-doc-the {
+  grid-row: 1;
+  grid-column: 1;
+  font-size: 10px;
+  font-weight: 800;
+  color: $lc-blue;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.lc-doc-title-line {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.lc-doc-life-care {
+  font-size: 22px;
+  font-weight: 800;
+  color: $lc-blue;
+  letter-spacing: 0.03em;
+}
+
+.lc-doc-medical-center {
   font-size: 17px;
   font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.lc-doc-title-blue {
-  color: $lc-blue;
-}
-
-.lc-doc-title-red {
   color: $lc-red;
+  letter-spacing: 0.04em;
 }
 
 .lc-patient-box-double {
@@ -74,6 +132,11 @@ $lc-line-blue: #5b9bd5;
   border-bottom: none;
 }
 
+.lc-pbox-cell-span {
+  grid-column: 1 / -1;
+  border-right: none;
+}
+
 .lc-pbox-label {
   font-weight: 700;
   margin-right: 4px;
@@ -84,18 +147,26 @@ $lc-line-blue: #5b9bd5;
 }
 
 .lc-doc-footer {
-  margin-top: 14px;
+  margin-top: auto;
+  flex: 0 0 auto;
   font-family: Arial, Helvetica, sans-serif;
   color: #000;
 }
 
-.lc-doc-footer-upper {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px 20px;
-  align-items: start;
-  margin-bottom: 6px;
+/* One row: address (+ optional doctor) left, 24h badge right — vertically centered */
+.lc-doc-footer-midrow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
   font-size: 10px;
+}
+
+.lc-doc-footer-left {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .lc-doc-addr {
@@ -116,34 +187,31 @@ $lc-line-blue: #5b9bd5;
   display: block;
 }
 
-.lc-doc-doctor {
-  text-align: right;
+.lc-doc-doctor-below {
+  margin-bottom: 6px;
   line-height: 1.3;
 }
 
-.lc-doc-doctor-name {
+.lc-doc-doctor-below .lc-doc-doctor-name {
   font-weight: 800;
   font-size: 10.5px;
 }
 
-.lc-doc-doctor-quals {
+.lc-doc-doctor-below .lc-doc-doctor-quals {
   font-size: 9.5px;
   font-weight: 600;
-}
-
-.lc-doc-24-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
 }
 
 .lc-doc-24-badge {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   font-weight: 800;
   line-height: 1;
+  flex: 0 0 auto;
+  align-self: center;
 }
 
 .lc-doc-24-num {
@@ -193,10 +261,30 @@ $lc-line-blue: #5b9bd5;
 }
 
 .lc-system-footer {
+  flex: 0 0 auto;
   margin: 8px 0 0;
   padding-top: 4px;
   font-size: 7.5pt;
   text-align: center;
   color: #444;
   line-height: 1.35;
+}
+
+.lc-developer-credit {
+  flex: 0 0 auto;
+  margin: 6px 0 0;
+  font-size: 6.5pt;
+  text-align: center;
+  color: #777;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+@media print {
+  .lc-doc-footer,
+  .lc-system-footer,
+  .lc-developer-credit {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }

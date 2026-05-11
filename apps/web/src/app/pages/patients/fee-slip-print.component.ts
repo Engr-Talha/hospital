@@ -76,7 +76,9 @@ export class FeeSlipPrintComponent implements OnInit {
   }
 
   dateFormatForPrint(): string {
-    return this.layoutMode() === 'pos' ? 'dd/MM/y HH:mm' : 'dd/MM/yyyy';
+    return this.layoutMode() === 'pos'
+      ? 'dd/MM/y, h:mm a'
+      : 'dd/MM/yyyy, h:mm a';
   }
 
   isSingleChargeSlip(): boolean {

@@ -4,12 +4,12 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Gender, Patient } from '@hospital/shared';
 import { Button } from 'primeng/button';
+import { APP_BRANDING } from '../../core/branding';
 import { PatientsService } from '../../core/patients.service';
-import { LifeCarePrintChromeComponent } from '../../shared/life-care-print-chrome/life-care-print-chrome.component';
 
 @Component({
   selector: 'app-patient-print',
-  imports: [Button, DatePipe, LifeCarePrintChromeComponent],
+  imports: [Button, DatePipe],
   templateUrl: './patient-print.component.html',
   styleUrl: './patient-print.component.scss',
 })
@@ -24,6 +24,7 @@ export class PatientPrintComponent implements OnInit, OnDestroy {
   readonly printedAt = signal(new Date());
 
   readonly Gender = Gender;
+  readonly branding = APP_BRANDING;
 
   ngOnInit(): void {
     this.previousTitle = this.title.getTitle();

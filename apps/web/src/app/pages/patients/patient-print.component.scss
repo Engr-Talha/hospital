@@ -1,5 +1,13 @@
 @use './life-care-slip-shared' as *;
 
+.lc-slip-court {
+  text-align: right;
+  font-size: 9px;
+  font-style: italic;
+  color: #444;
+  margin: 4px 0 0;
+}
+
 .lc-main {
   display: grid;
   grid-template-columns: minmax(0, 30%) 0 minmax(0, 1fr);
