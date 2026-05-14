@@ -1,9 +1,11 @@
 @use '../patients/life-care-slip-shared' as *;
 
-/* Word/CKEditor paste can set page-break-before: always; html2pdf’s css mode may respect it */
+/* Word/CKEditor paste can set page-break-before: always; html2pdf’s css mode may respect it.
+   font-size inherit normalizes pasted inline sizes to the report body (14px on .lab-rich-print). */
 .lab-rich-print ::ng-deep * {
   page-break-before: auto !important;
   break-before: auto !important;
+  font-size: inherit !important;
 }
 
 .lab-court-disclaimer {
@@ -29,7 +31,7 @@
 }
 
 .lab-field-body {
-  font-size: 10.5px;
+  font-size: 14px;
   line-height: 1.35;
   white-space: pre-wrap;
   word-break: break-word;
@@ -39,7 +41,7 @@
 }
 
 .lab-rich-print {
-  font-size: 10.5px;
+  font-size: 14px;
   line-height: 1.4;
   word-break: break-word;
   padding: 6px 0;
@@ -67,7 +69,6 @@
 .lab-rich-print ::ng-deep th {
   border: 1px solid #999;
   padding: 2px 4px;
-  font-size: 10px;
 }
 
 .lab-rich-print ::ng-deep img {
@@ -78,8 +79,8 @@
 .lab-rich-print ::ng-deep h1,
 .lab-rich-print ::ng-deep h2,
 .lab-rich-print ::ng-deep h3 {
-  font-size: 11px;
   margin: 0.6em 0 0.3em;
+  font-weight: 700;
 }
 
 @media print {

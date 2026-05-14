@@ -26,6 +26,22 @@
   padding-right: 6px;
 }
 
+/* Vitals + History and Diagnosis only (Investigations keeps default sizes) */
+.lc-sidebar > .lc-side-group:nth-child(-n + 2) {
+  .lc-side-title {
+    font-size: 14px;
+  }
+
+  .lc-kv,
+  .lc-note-line {
+    font-size: 14px;
+  }
+}
+
+.lc-sidebar > .lc-side-group:nth-child(1) .lc-kv span:first-child {
+  flex: 0 0 3rem;
+}
+
 .lc-side-group {
   margin-bottom: 12px;
 }
