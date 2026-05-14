@@ -1,0 +1,16 @@
+---
+description: Use feature branches and pull requests; avoid direct pushes to main
+alwaysApply: true
+---
+
+# Git: branch and pull request workflow
+
+For this repository, prefer **not** committing or pushing directly to `main`.
+
+1. **Branch** from up-to-date `main`: `git checkout main && git pull && git checkout -b feature/<short-name>` (or `fix/`, `chore/` as appropriate).
+2. **Commit** on the feature branch with a clear message.
+3. **Push** the branch: `git push -u origin HEAD`.
+4. **Open a pull request** into `main` on GitHub and merge after review (or use team process).
+5. Only push to `main` directly when explicitly asked (e.g. hotfix, revert) or when the user overrides this rule.
+
+When the user asks to "push" or "merge to main", default to this flow unless they specify otherwise.
